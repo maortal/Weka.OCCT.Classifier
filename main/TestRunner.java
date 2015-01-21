@@ -18,7 +18,7 @@ public class TestRunner {
 	public static void main(String [] argv) throws IOException {
 		// load data
 		BufferedReader reader = new BufferedReader(
-				new FileReader("../data/database_misuse_example_1.arff"));
+				new FileReader(argv[0] + "database_misuse_example_1.arff"));
 		Instances data = new Instances(reader);
 		reader.close();
 
