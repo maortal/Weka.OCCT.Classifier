@@ -1,7 +1,7 @@
 # OCCT Classifier implementation for Weka
 
 
-####OCCT: A One-Class Clustering Tree for. Implementing One-to-Many Data Linkage
+####OCCT: A One-Class Clustering Tree for Implementing One-to-Many Data Linkage
 ######Abstract
 
 One-to-many data linkage is an essential task in many domains, yet only a handful of prior publications have addressed this
