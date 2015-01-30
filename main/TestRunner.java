@@ -2,6 +2,7 @@ import tree.OCCT;
 import weka.core.Instances;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -18,7 +19,7 @@ public class TestRunner {
 	public static void main(String [] argv) throws IOException {
 		// load data
 		BufferedReader reader = new BufferedReader(
-				new FileReader(argv[0] + "database_misuse_example_1.arff"));
+				new FileReader(new File(argv[0], "database_misuse_example_1.arff")));
 		Instances data = new Instances(reader);
 		reader.close();
 
