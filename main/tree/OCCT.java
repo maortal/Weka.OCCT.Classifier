@@ -2,12 +2,7 @@ package tree;
 
 import java.util.*;
 
-import org.w3c.dom.Attr;
-import split.OCCTSplitModelFactory;
 import weka.classifiers.Classifier;
-import weka.classifiers.trees.j48.C45PruneableClassifierTree;
-import weka.classifiers.trees.j48.ModelSelection;
-import weka.classifiers.trees.j48.PruneableClassifierTree;
 import weka.core.*;
 
 public class OCCT extends Classifier implements OptionHandler, TechnicalInformationHandler {
@@ -72,7 +67,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 
 		OCCTSplitModelSelection modelSelection =
 				//new OCCTSplitModelSelection("CoarseGrainedJaccard", instances, attributesOfB);
-				new OCCTSplitModelSelection("LeastProbableIntersections", instances, attributesOfB);
+				new OCCTSplitModelSelection("FineGrainedJaccard", instances, attributesOfB);
+				//new OCCTSplitModelSelection("LeastProbableIntersections", instances, attributesOfB);
+				//new OCCTSplitModelSelection("MaximumLikelihoodEstimation", instances, attributesOfB);
 		this.m_root = new OCCTInternalClassifierNode(modelSelection);
 		// Now, build the tree.OCCT tree using the instances
 		this.m_root.buildClassifier(instances);

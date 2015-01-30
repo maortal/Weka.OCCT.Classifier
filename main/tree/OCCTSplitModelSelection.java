@@ -1,16 +1,14 @@
 package tree;
 
-import org.w3c.dom.Attr;
-import split.OCCTNoSplitModel;
-import split.OCCTSingleAttributeSplitModel;
-import split.OCCTSplitModelFactory;
+import split.models.OCCTNoSplitModel;
+import split.models.OCCTSingleAttributeSplitModel;
+import split.auxiliary.OCCTSplitModelFactory;
 import weka.classifiers.trees.j48.*;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.core.RevisionUtils;
 
 import java.util.*;
-import java.util.jar.Attributes;
 
 /**
  * Created by sepetnit on 30/12/14.
@@ -156,8 +154,9 @@ public class OCCTSplitModelSelection extends ModelSelection {
                 // Get model for current attribute.
                 // TODO: How to decide which type of split it will be???
                 OCCTSingleAttributeSplitModel currentSplitModel =
-                        OCCTSplitModelFactory.getSplitModel(this.m_splitCriterionType,
-                                nextAttribute, this.m_possibleAttributes);
+                        OCCTSplitModelFactory.getSplitModel(
+                                this.m_splitCriterionType,
+                                nextAttribute, this.m_possibleAttributes, this.m_attributesOfB);
                 currentSplitModel.buildClassifier(data);
 
                 // TODO: Check if useful split for current attribute exists and check for
