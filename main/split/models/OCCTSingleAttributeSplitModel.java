@@ -132,8 +132,8 @@ public abstract class OCCTSingleAttributeSplitModel extends ClassifierSplitModel
         return nonEmpty.toArray(new Instances[nonEmpty.size()]);
     }
 
-    protected double calculateSplitScore(Pair<Instances,
-            Instances> instancesSetsPair) throws Exception {
+    protected double calculateSplitScore(Pair<Instances, Instances> instancesSetsPair)
+            throws Exception {
         return this.calculateSplitScore(instancesSetsPair.getFirst(),
                 instancesSetsPair.getSecond());
     }
@@ -180,13 +180,8 @@ public abstract class OCCTSingleAttributeSplitModel extends ClassifierSplitModel
                 Pair<Pair<Instances, Instances>, Double> instancesAndWeights =
                         instancesSetsIter.next();
                 Pair<Instances, Instances> instancesSetsToCompare = instancesAndWeights.getFirst();
-                System.out.println("***");
-                System.out.println(instancesSetsToCompare.getFirst().numInstances());
-                //System.out.println(instancesSetsToCompare.getSecond().numInstances());
-                System.out.println("***");
                 double weight = instancesAndWeights.getSecond();
                 // Calculate the relative part of this binary split
-                System.out.println("Weight: " + weight);
                 toReturn += weight * this.calculateSplitScore(instancesSetsToCompare);
             }
         }

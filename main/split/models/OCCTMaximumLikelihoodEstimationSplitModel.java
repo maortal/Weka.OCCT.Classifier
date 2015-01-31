@@ -1,20 +1,20 @@
 package split.models;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import split.auxiliary.OCCTSplitModelComparators;
 import split.iterators.GeneralInstancesIterator;
 import split.iterators.SingleInstancesPairIterator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.classifiers.Classifier;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sepetnit on 16/01/15.
@@ -44,55 +44,45 @@ public class OCCTMaximumLikelihoodEstimationSplitModel extends OCCTSingleAttribu
         this.probabilisticModels = new HashMap<Attribute, Classifier>(this.m_attributesOfB.size());
     }
 
+    private Remove getRemoveFilter() {
+        // A filter to remove unnecessary columns
+        // A new filter is required for each attribute since the class index is specified for
+        // the filter using the dataset and cannot be changed by the API of the filtered
+        // classifier
+        Remove rm = new Remove();
+        // Only the specified attributes are kept
+        rm.setInvertSelection(true);
+        // Only B attributes should remain
+        rm.setAttributeIndicesArray(this.attributesOfBIndexes);
+        return rm;
+    }
+
+    private J48 getActualClassifier() {
+        // TODO: Set minimum number of objects in a leaf? (setMinNumObj)
+        J48 currentActualClassifier = new J48();
+        currentActualClassifier.setUseLaplace(true);
+        currentActualClassifier.setUnpruned(true);
+        return currentActualClassifier;
+    }
+
     private void buildModels(Instances instances) {
-        try {
         // First, let's remove the unnecessary attributes
         this.probabilisticModels.clear();
-        Remove rm = new Remove();
-        rm.setInvertSelection(true);
-        rm.setAttributeIndicesArray(this.attributesOfBIndexes);
         for (Attribute attr : this.m_attributesOfB) {
-            System.out.println("Building model for attr " + attr.name() + " index " + attr.index());
+            instances.setClass(attr);
             FilteredClassifier filteredClassifier = new FilteredClassifier();
-            J48 currentActualClassifier = new J48();
-            currentActualClassifier.setUseLaplace(true);
-            currentActualClassifier.setUnpruned(true);
-            filteredClassifier.setFilter(rm);
-            filteredClassifier.setClassifier(currentActualClassifier);
+            filteredClassifier.setFilter(this.getRemoveFilter());
+            filteredClassifier.setClassifier(this.getActualClassifier());
             // Train and make predictions
             try {
-                // TODO: Set minimum number of objects in a leaf? (setMinNumObj)
-                instances.setClass(attr);
+                // Here, the Remove filter learns the class index
                 filteredClassifier.buildClassifier(instances);
-                //System.out.println(filteredClassifier.graph());
-
-                System.out.println("Start of print");
-                //System.out.println(instances.toString());
-                System.out.println("End of print");
-
-                System.out.println(filteredClassifier.toString());
-                Enumeration instancesEnum = instances.enumerateInstances();
-                while (instancesEnum.hasMoreElements()) {
-                    Instance currentInstance = (Instance) instancesEnum.nextElement();
-                    if (currentInstance.stringValue(attr).equals("Hamburg")) {
-                        System.out.println("Classifying instance " + currentInstance.toString());
-                        System.out.println("Value " + Arrays.toString(filteredClassifier.distributionForInstance(currentInstance)));
-                        System.out.println("Value " + Arrays.toString(filteredClassifier.distributionForInstance(currentInstance)));
-                    }
-                }
             }
             catch (Exception e) {
+                // TODO: What should be done in case of an error here?
                 e.printStackTrace();
             }
-            System.out.println("put classifier " + attr.name() + " fil " + filteredClassifier.hashCode());
             this.probabilisticModels.put(attr, filteredClassifier);
-        }
-            System.out.println("A");
-        System.out.println(this.probabilisticModels.toString());
-        System.out.println("Done");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -102,41 +92,11 @@ public class OCCTMaximumLikelihoodEstimationSplitModel extends OCCTSingleAttribu
         for (Map.Entry<Attribute, Classifier> entry : this.probabilisticModels.entrySet()) {
             Attribute currentAttribute = entry.getKey();
             Classifier currentClassifier = entry.getValue();
-            System.out.println("Got classifier" + currentClassifier.hashCode());
-            System.out.println("Testing model for attribute " + currentAttribute.name());
             allInstances.setClass(currentAttribute);
-            System.out.println("Class index of instances is " + allInstances.classIndex());
-            System.out.println("Class index of instance is " + currentInstance.classIndex());
-            System.out.println("Classifier is " + currentClassifier.toString());
-            System.out.println("Instance is " + currentInstance.toString());
-
-            FilteredClassifier c = (FilteredClassifier)currentClassifier;
-            Instances i = Filter.useFilter(allInstances, c.getFilter());
-            System.out.println("Filtered is i" );
-            System.out.println(i.toString());
-            System.out.println("class " + i.classIndex());
-
-
-
-            double[] dist = ((FilteredClassifier)currentClassifier).distributionForInstance(currentInstance);
-            System.out.println("Classificationn is " + currentClassifier.classifyInstance(currentInstance));
-            if (currentInstance.stringValue(currentAttribute).equals("Hamburg")) {
-                System.out.println("Classes " + currentInstance.numClasses());
-                System.out.println("Dist is " + Arrays.toString(dist));
-                System.out.println(dist.length);
-                dist = currentClassifier.distributionForInstance(currentInstance);
-                System.out.println("Dist is " + Arrays.toString(dist));
-            }
-            System.out.println("Values count : " + currentAttribute.numValues());
-            Enumeration e = currentAttribute.enumerateValues();
-            while (e.hasMoreElements()) {
-                String t = (String)e.nextElement();
-                System.out.println("Value is " + t);
-            }
-            System.out.println("Current Value is " + currentInstance.stringValue(currentAttribute));
+            double[] dist = currentClassifier.distributionForInstance(currentInstance);
             int valueIndex = currentAttribute.indexOfValue(
                     currentInstance.stringValue(currentAttribute));
-            toReturn += Math.log(dist[valueIndex]);
+            toReturn += Math.log10(dist[valueIndex]);
         }
         return toReturn;
     }
@@ -153,10 +113,9 @@ public class OCCTMaximumLikelihoodEstimationSplitModel extends OCCTSingleAttribu
 
     @Override
     protected double calculateSplitScore(Instances i1, Instances i2) throws Exception {
-        System.out.println(this.m_splittingAttribute.name());
         // Let's assert that the second instance is null
         // (since we calculate score for a single instance only in MLE)
-        assert (i2 != null);
+        assert (i2 == null);
         // First, build the probabilistic models
         this.buildModels(i1);
         // Once the set of models has been induced, the probability of each record given these
