@@ -1,12 +1,14 @@
 package split.models;
 
 import split.iterators.GeneralInstancesIterator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import split.iterators.PairedInstancesIterator;
-import weka.classifiers.trees.j48.ClassifierSplitModel;
-import weka.core.*;
-
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import utils.Pair;
+import weka.classifiers.trees.j48.ClassifierSplitModel;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.RevisionUtils;
 
 import java.util.*;
 
@@ -164,7 +166,6 @@ public abstract class OCCTSingleAttributeSplitModel extends ClassifierSplitModel
     protected double handleEnumeratedAttribute(Instances trainInstances) throws Exception {
         System.out.println("Handling splitting " + this.m_splittingAttribute.name());
         double toReturn = 0;
-
         // Split the instances according to the attribute (single set for each value)
         Instances[] splitted = OCCTSingleAttributeSplitModel.splitInstancesByAttribute(
                 trainInstances, this.m_splittingAttribute);
@@ -234,7 +235,10 @@ public abstract class OCCTSingleAttributeSplitModel extends ClassifierSplitModel
      * @param data training set.
      */
     public String leftSide(Instances data) {
-        return this.m_splittingAttribute.name();
+        StringBuilder text = new StringBuilder();
+        text.append(this.m_splittingAttribute.name());
+        text.append(" = ");
+        return text.toString();
     }
 
     @Override
@@ -245,14 +249,13 @@ public abstract class OCCTSingleAttributeSplitModel extends ClassifierSplitModel
      * @param data training set.
      */
     public String rightSide(int index, Instances data) {
-        StringBuilder text = new StringBuilder();
         if (this.m_splittingAttribute.isNominal()) {
-            text.append(" = ");
-            text.append(this.m_splittingAttribute.value(index));
+            return this.m_splittingAttribute.value(index);
         } else if (this.m_splittingAttribute.isNumeric()) {
             //throw new NotImplementedException();
         }
-        return text.toString();
+        // TODO ...
+        return null;
     }
 
     @Override

@@ -2,12 +2,14 @@ package tree;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import utils.MyStringBuffer;
+import utils.Pair;
 import weka.classifiers.trees.j48.ClassifierSplitModel;
 import weka.core.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  /**
@@ -301,6 +303,25 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         return nodesCount;
     }
 
+    private List<Pair<String, OCCTInternalClassifierNode> > getSortedSons() {
+        List<Pair<String, OCCTInternalClassifierNode> > toReturn =
+                new ArrayList<Pair<String, OCCTInternalClassifierNode>>(this.m_sons.length);
+        // Fill the list
+        for (int i = 0; i < this.m_sons.length; ++i) {
+            toReturn.add(new Pair<String, OCCTInternalClassifierNode>(
+                    this.m_localModel.rightSide(i, this.m_train), this.m_sons[i]));
+        }
+        // Sort the list
+        toReturn.sort(new Comparator<Pair<String, OCCTInternalClassifierNode>>() {
+            @Override
+            public int compare(Pair<String, OCCTInternalClassifierNode> firstPair,
+                               Pair<String, OCCTInternalClassifierNode> secondPair) {
+                return firstPair.getFirst().compareTo(secondPair.getFirst());
+            }
+        });
+        return toReturn;
+    }
+
     /**
      * A help method for printing node's structure.
      *
@@ -311,19 +332,24 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      */
     private void dumpTree(int depth, MyStringBuffer text) throws Exception {
         // Go over all the sons of the node
-        for (int i = 0; i < this.m_sons.length; ++i) {
-            text.append("\n");
-            // Print the relevant number of delimiters (one below the required depth)
-            for (int j = 0; j < depth; j++) {
-                text.append("|   ");
-            }
-            text.append(this.m_localModel.leftSide(this.m_train));
-            text.append(this.m_localModel.rightSide(i, this.m_train));
-            if (this.m_sons[i].m_isLeaf) {
-                text.append(": <Leaf>");
-                //text.append(this.m_localModel.dumpLabel(i,m_train));
-            } else {
-                this.m_sons[i].dumpTree(depth + 1, text);
+        List<Pair<String, OCCTInternalClassifierNode> > sons = this.getSortedSons();
+        for (Pair<String, OCCTInternalClassifierNode> current : sons) {
+            String rightSide = current.getFirst();
+            OCCTInternalClassifierNode currentSon = current.getSecond();
+            if (!currentSon.m_isEmpty) {
+                text.append("\n");
+                // Print the relevant number of delimiters (one below the required depth)
+                for (int j = 0; j < depth; j++) {
+                    text.append("|   ");
+                }
+                text.append(this.m_localModel.leftSide(this.m_train));
+                text.append(rightSide);
+                if (currentSon.m_isLeaf) {
+                    text.append(": <Leaf>");
+                    //text.append(this.m_localModel.dumpLabel(i,m_train));
+                } else {
+                    currentSon.dumpTree(depth + 1, text);
+                }
             }
         }
     }
