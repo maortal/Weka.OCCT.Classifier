@@ -13,12 +13,10 @@ public class SingleInstancesPairIterator extends GeneralInstancesIterator {
      * In this case all weights are equal (according to the subsets count)
      */
     protected double calculateCurrentWeight() {
-        return 1.0 / this.splittedInstances.length;
+        return 1.0;
     }
 
     public boolean _hasNext() {
-        System.out.println(this.currentInstancesIndex);
-        System.out.println(this.splittedInstances.length);
         return this.currentInstancesIndex < this.splittedInstances.length;
     }
 
