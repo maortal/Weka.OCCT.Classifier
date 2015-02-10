@@ -1,30 +1,31 @@
-package split.models;
+package weka.classifiers.trees.occt.split.models;
 
-import weka.classifiers.trees.j48.ClassifierSplitModel;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.RevisionUtils;
 
 /**
- * Class implementing a "no-split"-split.
+ * Class implementing a "no-weka.trees.classifiers.occt.split"-weka.trees.classifiers.occt.split.
  *
  * @author Eibe Frank (eibe@cs.waikato.ac.nz)
  * @version $Revision: 1.9 $
  */
-public final class OCCTNoSplitModel extends ClassifierSplitModel {
+public final class OCCTNoSplitModel extends OCCTSplitModel {
 
     /** for serialization */
     private static final long serialVersionUID = -1292620749331337546L;
 
     /**
-     * Creates "no-split"-split
+     * Creates "no-weka.trees.classifiers.occt.split"-weka.trees.classifiers.occt.split
      */
-    public OCCTNoSplitModel(){ }
+    public OCCTNoSplitModel() {
+        super();
+    }
 
     /**
-     * Creates a "no-split"-split for a given set of instances.
+     * Creates a "no-weka.trees.classifiers.occt.split"-weka.trees.classifiers.occt.split for a given set of instances.
      *
-     * @exception Exception if split can't be built successfully
+     * @exception Exception if weka.trees.classifiers.occt.split can't be built successfully
      */
     public final void buildClassifier(Instances instances) throws Exception {
     }

@@ -1,4 +1,4 @@
-package split.auxiliary;
+package weka.classifiers.trees.occt.split.auxiliary;
 
 import weka.core.Utils;
 

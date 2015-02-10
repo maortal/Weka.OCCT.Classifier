@@ -1,12 +1,9 @@
-package utils;
+package weka.classifiers.trees.occt.utils;
 
-import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by sepetnit on 27/12/14.
@@ -34,9 +31,4 @@ public class OCCTGeneralSplitCriterionUtils {
         }
         return toReturn;
     }
-
-
-
-
-
 }

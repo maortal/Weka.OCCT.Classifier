@@ -1,6 +1,6 @@
-package split.models;
+package weka.classifiers.trees.occt.split.models;
 
-import split.auxiliary.OCCTSplitModelComparators;
+import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -21,8 +21,10 @@ import java.util.*;
  */
 public class OCCTCoarseGrainedJaccardSplitModel extends OCCTSingleAttributeSplitModel {
 
+    private static final long serialVersionUID = 5232633291775764495L;
+
     static {
-        OCCTCoarseGrainedJaccardSplitModel.m_scoresComparator =
+        m_scoresComparator =
                 OCCTSplitModelComparators.LOWEST_SCORE_CHOOSER;
     }
 

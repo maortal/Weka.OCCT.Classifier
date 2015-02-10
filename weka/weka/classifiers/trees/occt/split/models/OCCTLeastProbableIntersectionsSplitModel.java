@@ -1,6 +1,6 @@
-package split.models;
+package weka.classifiers.trees.occt.split.models;
 
-import split.auxiliary.OCCTSplitModelComparators;
+import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -15,7 +15,7 @@ import java.util.*;
 public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttributeSplitModel {
 
     static {
-        OCCTLeastProbableIntersectionsSplitModel.m_scoresComparator =
+        m_scoresComparator =
                 OCCTSplitModelComparators.HIGHEST_SCORE_CHOOSER;
     }
 
@@ -53,7 +53,7 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
 
     /**
      * Calculates single probability of an instance being a part of the intersection of
-     * a random split of instances to sets of the same sizes like the given sets of instances
+     * a random weka.trees.classifiers.occt.split of instances to sets of the same sizes like the given sets of instances
      *
      * @param instance An instance whose probability should be calculated
      * @param allInstancesSets All the sets of instances to calculate according too
@@ -87,7 +87,7 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
     /**
      * The function calculates lambda value which is the sum of single probabilities, each one
      * denotes the probability of a record to belong to all the sets of instances in a random
-     * split of the unified set to sets of same sizes. For further explanation look at the
+     * weka.trees.classifiers.occt.split of the unified set to sets of same sizes. For further explanation look at the
      * description of {@see calculateSingleProbability}
      *
      * @param allInstancesSets The sets of instances (divided)

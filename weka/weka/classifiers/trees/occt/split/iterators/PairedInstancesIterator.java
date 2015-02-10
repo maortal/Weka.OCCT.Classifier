@@ -1,6 +1,6 @@
-package split.iterators;
+package weka.classifiers.trees.occt.split.iterators;
 
-import utils.Pair;
+import weka.classifiers.trees.occt.utils.Pair;
 import weka.core.Instance;
 import weka.core.Instances;
 
