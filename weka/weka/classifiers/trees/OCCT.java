@@ -322,31 +322,36 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @return The extracted attributes of the table T_B
 	 */
 	private List<Attribute> checkAndGetAttributesOfB(Instances instances) throws Exception {
+		// Initialize the result list
+		List<Attribute> attributesOfB = new LinkedList<Attribute>();
+		// The last possible index
 		int lastIndex = instances.numAttributes() - 1;
 		// In case there is a fake class attribute - we shouldn't include it
 		if (this.shouldAddClassAttribute) {
 			lastIndex--;
 		}
-		// Treat only too low values. Too high values are treated in this method.
-		this.m_FirstAttributeIndexOfB.setUpper(Integer.MAX_VALUE);
-		// Initialize the result list
-		List<Attribute> attributesOfB = new LinkedList<Attribute>();
-		// Check too low index
-		if (this.m_FirstAttributeIndexOfB.getIndex() == 0) {
-			throw new IllegalArgumentException("There are no attributes for table A.\n"+
-				"Please choose first attribute index for table B, that is greater than 0.");
-		}
-		// Check too big index
-		if (this.m_FirstAttributeIndexOfB.getIndex() > lastIndex) {
-			throw new IllegalArgumentException("Illegal index was chosen for first attribute\n"+
-					"of table B - there are only " + (lastIndex + 1) + " attributes.\n" +
-					"Thus, the index must be between 1 and " + (lastIndex + 1) + "\n");
-		}
-		// Call again - set the real value and raise exception on errors
-		// Update the last possible index of attribute (and this actually sets the index)
-		this.m_FirstAttributeIndexOfB.setUpper(lastIndex);
-		for (int i = this.m_FirstAttributeIndexOfB.getIndex(); i <= lastIndex; ++i) {
-			attributesOfB.add(instances.attribute(i));
+		try {
+			int index = Integer.parseInt(this.m_FirstAttributeIndexOfB.getSingleIndex());
+			// Check too low index
+			if (index == 0) {
+				throw new IllegalArgumentException("There are no attributes for table A.\n"+
+					"Please choose first attribute index for table B, that is greater than 0.");
+			}
+			// Check too big index
+			if (index > lastIndex + 1) {
+				throw new IllegalArgumentException("Illegal index was chosen for first attribute\n"+
+						"of table B - there are only " + (lastIndex + 1) + " attributes.\n" +
+						"Thus, the index must be between 1 and " + (lastIndex + 1) + "\n");
+			}
+			// Call again - set the real value and raise exception on errors
+			// Update the last possible index of attribute (and this actually sets the index)
+			this.m_FirstAttributeIndexOfB.setUpper(lastIndex);
+			for (int i = this.m_FirstAttributeIndexOfB.getIndex(); i <= lastIndex; ++i) {
+				attributesOfB.add(instances.attribute(i));
+			}
+		} catch (NumberFormatException e) {
+			// If any exception occurred, use the generic function
+			this.m_FirstAttributeIndexOfB.setUpper(lastIndex);
 		}
 		return attributesOfB;
 	}
