@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- /**
  * Class for handling a weka.trees.classifiers.occt.split.tree structure used for
  * classification.
  *
@@ -30,35 +30,55 @@ import java.util.Map;
 public class OCCTInternalClassifierNode implements Drawable, Serializable,
         CapabilitiesHandler, RevisionHandler {
 
-    /** for serialization */
+    /**
+     * for serialization
+     */
     static final long serialVersionUID = -973249211542528293L;
 
-    /** References to sons. */
+    /**
+     * References to sons.
+     */
     protected Map<String, OCCTInternalClassifierNode> m_sons;
 
-    /** References to parent. */
+    /**
+     * References to parent.
+     */
     protected OCCTInternalClassifierNode m_parent;
 
-    /** True if node is empty. */
+    /**
+     * True if node is empty.
+     */
     protected boolean m_isEmpty;
 
-    /** True if node is leaf. */
+    /**
+     * True if node is leaf.
+     */
     protected boolean m_isLeaf;
 
-    /** The training instances. */
+    /**
+     * The id for the node.
+     */
+    protected int m_id;
+
+    /**
+     * The training instances.
+     */
     protected Instances m_train;
 
-    /** The model selection method. */
+    /**
+     * The model selection method.
+     */
     protected OCCTSplitModelSelection m_modelSelectionMethod;
 
-    /** Local model at node. */
+    /**
+     * Local model at node.
+     */
     protected OCCTSplitModel m_localModel;
 
     protected OCCTLeafNode m_leafModel;
 
     /**
      * Constructor
-     *
      */
     public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod) {
         this.m_sons = null;
@@ -99,12 +119,22 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
 
     @Override
     public int graphType() {
-        return 0;
+        return Drawable.TREE;
     }
 
     @Override
+    /**
+     * Returns graph describing the tree.
+     *
+     * @throws Exception if something goes wrong
+     * @return the tree as graph
+     */
     public String graph() throws Exception {
-        return null;
+        assignIDs(-1);
+        MyStringBuffer text = new MyStringBuffer();
+        text.append("digraph OCCTTree {\n");
+        graphTree(text);
+        return text.toString() + "}\n";
     }
 
     @Override
@@ -142,7 +172,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
 
     /**
      * @return The Attribute of the splitting model associated with this node or null if there is
-     *         still no model
+     * still no model
      */
     public Attribute getChosenAttribute() {
         if (this.m_localModel != null) {
@@ -182,9 +212,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * Classifies an instance.
      *
      * @param instance the instance to classify
-     *
      * @return the classification
-     *
      * @throws Exception if something goes wrong
      */
     public double classifyInstance(Instance instance) throws Exception {
@@ -204,9 +232,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * Returns a newly created weka.trees.classifiers.occt.split.tree.
      *
      * @param data the training data
-     *
      * @return the generated weka.trees.classifiers.occt.split.tree
-     *
      * @throws Exception if something goes wrong
      */
     protected OCCTInternalClassifierNode getNewTree(Instances data) throws Exception {
@@ -224,8 +250,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * Builds the weka.trees.classifiers.occt.split.tree structure.
      *
      * @param instances the data for which the weka.trees.classifiers.occt.split.tree structure is to be generated.
-     * @param keepData is training data to be kept?
-     *
+     * @param keepData  is training data to be kept?
      * @throws Exception if something goes wrong
      */
     public void buildTree(Instances instances, boolean keepData) throws Exception {
@@ -242,7 +267,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
             Attribute chosenAttribute = this.m_localModel.getChosenAttribute();
             // Perform the actual split
             Instances[] localSplittedTrain = this.m_localModel.split(instances);
-                    //((OCCTSingleAttributeSplitModel)this.m_localModel).splitInstances(instances);
+            //((OCCTSingleAttributeSplitModel)this.m_localModel).splitInstances(instances);
             // Initialize sons and continue splitting
             this.m_sons = new HashMap<String, OCCTInternalClassifierNode>(
                     this.m_localModel.numSubsets());
@@ -250,7 +275,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
                 this.m_sons.put(chosenAttribute.value(i), this.getNewTree(localSplittedTrain[i]));
                 localSplittedTrain[i] = null;
             }
-        } else{
+        } else {
             this.m_isLeaf = true;
 
             // TODO?
@@ -279,7 +304,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         } else if (this.m_isEmpty) {
             return 0;
         }
-        for (OCCTInternalClassifierNode son: this.m_sons.values()) {
+        for (OCCTInternalClassifierNode son : this.m_sons.values()) {
             leavesCount += son.getLeavesCount();
         }
         return leavesCount;
@@ -291,7 +316,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * @return the number of nodes
      */
     public int getNodesCount() {
-        int nodesCount = this.m_isEmpty? 0 : 1;
+        int nodesCount = this.m_isEmpty ? 0 : 1;
         if (!this.m_isLeaf) {
             for (OCCTInternalClassifierNode son : this.m_sons.values()) {
                 nodesCount += son.getNodesCount();
@@ -301,10 +326,10 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     }
 
     private List<Pair<String, OCCTInternalClassifierNode>> getSortedSons() {
-        List<Pair<String, OCCTInternalClassifierNode> > toReturn =
+        List<Pair<String, OCCTInternalClassifierNode>> toReturn =
                 new ArrayList<Pair<String, OCCTInternalClassifierNode>>(this.m_sons.size());
         // Fill the list
-        for (Map.Entry<String, OCCTInternalClassifierNode> currentSon: this.m_sons.entrySet()) {
+        for (Map.Entry<String, OCCTInternalClassifierNode> currentSon : this.m_sons.entrySet()) {
             toReturn.add(new Pair<String, OCCTInternalClassifierNode>(
                     this.m_localModel.rightSide(currentSon.getKey(), this.m_train),
                     currentSon.getValue()));
@@ -324,8 +349,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * A help method for printing node's structure.
      *
      * @param depth the current depth
-     * @param text for outputting the structure
-     *
+     * @param text  for outputting the structure
      * @throws Exception if something goes wrong
      */
     private void dumpTree(int depth, MyStringBuffer text) throws Exception {
@@ -372,6 +396,52 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         } catch (Exception e) {
             e.printStackTrace();
             return "Can't print classification weka.trees.classifiers.occt.split.tree.";
+        }
+    }
+
+    /**
+     * Assigns a uniqe id to every node in the tree.
+     *
+     * @param lastID the last ID that was assign
+     * @return the new current ID
+     */
+    public int assignIDs(int lastID) {
+
+        int currLastID = lastID + 1;
+
+        m_id = currLastID;
+        if (m_sons != null) {
+            for (OCCTInternalClassifierNode current : m_sons.values())
+                currLastID = current.assignIDs(currLastID);
+        }
+        return currLastID;
+    }
+
+
+    /**
+     * Help method for printing tree structure as a graph.
+     *
+     * @param text for outputting the tree
+     * @throws Exception if something goes wrong
+     */
+    private void graphTree(MyStringBuffer text) throws Exception {
+        if (this.m_isLeaf)
+            text.append("N" + m_id + " [label=\""
+                    + this.m_leafModel.toString() + "\"]\n");
+        else {
+            text.append("N" + m_id + " [label=\""
+                    + this.m_localModel.leftSide(this.m_train) + "\"]\n");
+            List<Pair<String, OCCTInternalClassifierNode>> sons = this.getSortedSons();
+            for (Pair<String, OCCTInternalClassifierNode> current : sons) {
+                //TODO: remove repeated edges
+                String labelForEdge = current.getFirst();
+                OCCTInternalClassifierNode currentSon = current.getSecond();
+                if (!currentSon.m_isEmpty) {
+                    text.append("N" + m_id + " -> N" + currentSon.m_id
+                            + " [label=\"" + labelForEdge + "\"]\n");
+                    currentSon.graphTree(text);
+                }
+            }
         }
     }
 }

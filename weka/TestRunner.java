@@ -36,7 +36,6 @@ public class TestRunner {
 		try {
 			occt.buildClassifier(data);
 			System.out.println(occt.toString());
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);

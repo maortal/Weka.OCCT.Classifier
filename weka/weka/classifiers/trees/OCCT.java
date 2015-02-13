@@ -16,6 +16,7 @@ import weka.core.Tag;
 import weka.core.TechnicalInformation;
 import weka.core.TechnicalInformationHandler;
 import weka.core.Utils;
+import weka.core.Drawable;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 
@@ -25,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-public class OCCT extends Classifier implements OptionHandler, TechnicalInformationHandler {
+public class OCCT extends Classifier implements OptionHandler, TechnicalInformationHandler, Drawable {
 
 	/** for serialization */
 	private static final long serialVersionUID = 3850592762853236707L;
@@ -444,4 +445,24 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	public String getRevision() {
 		return RevisionUtils.extract("$Revision: 1.9 $");
 	}
+
+    /**
+     * Main method.
+     *
+     * @param args the options for the classifier
+     */
+    public static void main(String[] args) {
+        runClassifier(new OCCT(false), args);
+    }
+
+    @Override
+    public int graphType() {
+        return Drawable.TREE;
+    }
+
+    @Override
+    public String graph() throws Exception {
+        return m_root.graph();
+    }
+
 }
