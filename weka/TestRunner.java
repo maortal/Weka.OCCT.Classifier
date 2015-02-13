@@ -36,7 +36,8 @@ public class TestRunner {
 		try {
 			occt.buildClassifier(data);
 			System.out.println(occt.toString());
-		} catch (Exception e) {
+            //System.out.println(occt.graph()); //graph dot file test
+        } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
