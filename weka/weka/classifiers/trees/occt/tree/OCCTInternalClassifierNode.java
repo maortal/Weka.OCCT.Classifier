@@ -1,6 +1,7 @@
 package weka.classifiers.trees.occt.tree;
 
 import weka.classifiers.trees.occt.split.models.OCCTSplitModel;
+import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
 import weka.classifiers.trees.occt.utils.MyStringBuffer;
 import weka.classifiers.trees.occt.utils.Pair;
 import weka.core.Attribute;
@@ -71,6 +72,11 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     protected OCCTSplitModelSelection m_modelSelectionMethod;
 
     /**
+     * The chosen pruning method, used for pre-pruning of redundant branches
+     */
+    protected OCCTGeneralPruningMethod m_pruningMethod;
+
+    /**
      * Local model at node.
      */
     protected OCCTSplitModel m_localModel;
@@ -80,21 +86,44 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     /**
      * Constructor
      */
-    public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod) {
+    public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod,
+                                      OCCTGeneralPruningMethod pruningMethod) {
         this.m_sons = null;
         this.m_parent = null;
         this.m_train = null;
         this.m_isLeaf = false;
         this.m_localModel = null;
         this.m_modelSelectionMethod = modelSelectionMethod;
+        this.m_pruningMethod = pruningMethod;
         // This is not a leaf until specified
         this.m_leafModel = null;
     }
 
     public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod,
-                                      OCCTInternalClassifierNode parent) {
-        this(modelSelectionMethod);
+                                  OCCTInternalClassifierNode parent,
+                                  OCCTGeneralPruningMethod pruningMethod) {
+        this(modelSelectionMethod, pruningMethod);
         this.m_parent = parent;
+    }
+
+    /**
+     * This constructor assumes parent is null and also pruning method is null
+     */
+    public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod) {
+        this(modelSelectionMethod, null, null);
+    }
+
+    /**
+     * A constructor of the class, without any pruning method
+     *
+     * In case no pruning was defined, call the constructor with a null pruning method
+     *
+     * @param modelSelectionMethod The selection method to chose the best split model for each node
+     * @param parent The parent node
+     */
+    public OCCTInternalClassifierNode(OCCTSplitModelSelection modelSelectionMethod,
+                                      OCCTInternalClassifierNode parent) {
+        this(modelSelectionMethod, parent, null);
     }
 
     @Override
@@ -157,7 +186,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     }
 
     /**
-     * Method for building a pruneable classifier tree.
+     * Method for building a prunable classifier tree.
      *
      * @param instances the data to build the tree from
      * @throws Exception if weka.trees.classifiers.occt.split.tree can't be built successfully
@@ -240,16 +269,36 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         OCCTSplitModelSelection newModelSelection =
                 new OCCTSplitModelSelection(this.m_modelSelectionMethod,
                         this.m_localModel.getChosenAttribute());
+        // The pruning method remains the same
         OCCTInternalClassifierNode newTree =
-                new OCCTInternalClassifierNode(newModelSelection, this);
+                new OCCTInternalClassifierNode(newModelSelection, this, this.m_pruningMethod);
         newTree.buildTree(data, false);
         return newTree;
     }
 
+    private void buildLeaf(Instances instances) throws Exception {
+        this.m_isLeaf = true;
+        // TODO? Do we really need this?
+        if (Utils.eq(instances.sumOfWeights(), 0)) {
+            System.out.println("empty");
+            this.m_isEmpty = true;
+        } else {
+            // We reach a leaf - thus, models for that leaf should be created
+            // TODO: The attribute MUST be queried from the selection method
+            Attribute parentSplittingAttribute = null;
+            if (this.m_parent != null) {
+                parentSplittingAttribute = this.m_parent.getChosenAttribute();
+            }
+            this.m_leafModel = new OCCTLeafNode(this.m_modelSelectionMethod.getAttributesOfB(),
+                    parentSplittingAttribute);
+            this.m_leafModel.buildLeaf(instances);
+        }
+    }
+
     /**
-     * Builds the weka.trees.classifiers.occt.split.tree structure.
+     * Builds the tree structure.
      *
-     * @param instances the data for which the weka.trees.classifiers.occt.split.tree structure is to be generated.
+     * @param instances the data for which the tree structure is to be generated.
      * @param keepData  is training data to be kept?
      * @throws Exception if something goes wrong
      */
@@ -260,9 +309,17 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         // Currently that is not a leaf and there are no sons
         this.m_isLeaf = false;
         this.m_sons = null;
-        // Choose the local model on this node (according to the training instances set)
+        // First, let's check if we should perform pruning here - without continuing to branch
+        if (this.m_pruningMethod != null) {
+            if (this.m_pruningMethod.shouldPrune(instances)) {
+                this.buildLeaf(instances);
+                return;
+            }
+        }
+        // In any other case, create the leafs
         this.m_localModel = this.m_modelSelectionMethod.selectModel(instances);
-        // Continue to perform splits only if more that one subset was extracted
+        // Continue to perform splits only if more that one subset was extracted, otherwise, this
+        // is a leaf
         if (this.m_localModel.numSubsets() > 1) {
             Attribute chosenAttribute = this.m_localModel.getChosenAttribute();
             // Perform the actual split
@@ -276,19 +333,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
                 localSplittedTrain[i] = null;
             }
         } else {
-            this.m_isLeaf = true;
-
-            // TODO?
-            if (Utils.eq(instances.sumOfWeights(), 0)) {
-                System.out.println("empty");
-                this.m_isEmpty = true;
-            } else {
-                // We reach a leaf - thus, models for that leaf should be created
-                // TODO: The attribute MUST be queried from the selection method
-                this.m_leafModel = new OCCTLeafNode(this.m_modelSelectionMethod.getAttributesOfB(),
-                        this.m_parent.getChosenAttribute());
-                this.m_leafModel.buildLeaf(instances);
-            }
+            this.buildLeaf(instances);
         }
     }
 

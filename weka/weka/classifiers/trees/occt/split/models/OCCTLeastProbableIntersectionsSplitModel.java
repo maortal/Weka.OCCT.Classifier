@@ -15,7 +15,7 @@ import java.util.*;
 public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttributeSplitModel {
 
     static {
-        m_scoresComparator =
+        OCCTLeastProbableIntersectionsSplitModel.SCORES_COMPARATOR =
                 OCCTSplitModelComparators.HIGHEST_SCORE_CHOOSER;
     }
 

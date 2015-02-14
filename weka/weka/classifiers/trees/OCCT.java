@@ -1,10 +1,13 @@
 package weka.classifiers.trees;
 
 import weka.classifiers.Classifier;
+import weka.classifiers.trees.occt.split.general.OCCTPruningMethodFactory;
+import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
 import weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode;
 import weka.classifiers.trees.occt.tree.OCCTSplitModelSelection;
 import weka.core.Attribute;
 import weka.core.Capabilities;
+import weka.core.Drawable;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -16,7 +19,6 @@ import weka.core.Tag;
 import weka.core.TechnicalInformation;
 import weka.core.TechnicalInformationHandler;
 import weka.core.Utils;
-import weka.core.Drawable;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 
@@ -74,6 +76,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	private int m_SplitCriteria = SPLIT_MLE;
 	/** The chosen pruning method (one from the 2 possible) **/
 	private int m_PruningMethod = PRUNING_NO_PRUNING;
+	/** The threshold for the pruning method (not always used) **/
+	private double m_pruningThreshold = 0;
 	/** The first index of the sensitive attributes table (T_B). */
 	private SingleIndex m_FirstAttributeIndexOfB = new SingleIndex("last");
 
@@ -168,7 +172,37 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @return tip text for this property suitable for displaying in the explorer/experimenter gui
 	 */
 	public String pruningMethodTipText() {
-		return "The pruning method to use in order to decide which branches should be trimmed.";
+		return "The pruning method to use in order to decide which branches should be trimmed.\n"
+				+"The currently implemented pruning methods are:\n"
+				+"\t1. MLE\n"
+				+"\t2. LPI: Requires a pruning threshold in order to determine for which maximum\n"
+				+"\t        value we should prune";
+	}
+
+	/**
+	 * Gets the pruning threshold to use.
+	 *
+	 * @return pruning threshold.
+	 */
+	public double getPruningThreshold() {
+		return this.m_pruningThreshold;
+	}
+
+	/**
+	 * Sets the pruning threshold
+	 */
+	public void setPruningThreshold(double pruningThreshold) {
+		this.m_pruningThreshold = pruningThreshold;
+	}
+
+	/**
+	 * Returns the tip text for this property
+	 *
+	 * @return tip text for this property suitable for displaying in the explorer/experimenter gui
+	 */
+	public String pruningThresholdTipText() {
+		return "The threshold for the pruning method. This threshold is not always required." +
+				"Please look on the tip-text of the pruning method.";
 	}
 
 	/**
@@ -201,6 +235,11 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 						"\t(default: " + new SelectedTag(PRUNING_NO_PRUNING, TAGS_PRUNING_METHOD) + ")",
 				"P", 1, "-P " + Tag.toOptionList(TAGS_PRUNING_METHOD)));
 
+		newVector.addElement(new Option(
+				"\tThe pruning threshold.\n"+
+						"\t(default: 0)",
+				"R", 1, "-R <pruning threshold>"));
+
 		return newVector.elements();
 	}
 
@@ -221,6 +260,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 
 		options.add("-P");
 		options.add("" + getPruningMethod());
+
+		options.add("-R");
+		options.add("" + getPruningThreshold());
 
 		return options.toArray(new String[options.size()]);
 	}
@@ -357,6 +399,26 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		return attributesOfB;
 	}
 
+	private OCCTSplitModelSelection getSplitMethod(Instances allData,
+												   List<Attribute> attributesOfB) {
+		String splitSelectionMethodName = this.getSplitCriteria().getSelectedTag().getReadable();
+		// Initialize and return the model selection method according to the required name
+		return new OCCTSplitModelSelection(splitSelectionMethodName, allData,
+				attributesOfB,
+				// Except the defined class attribute - it is not relevant.
+				allData.classIndex() != -1? allData.classAttribute() : null);
+	}
+
+	private OCCTGeneralPruningMethod getPruner(Instances allData,
+											   List<Attribute> attributesOfB) throws NoSuchMethodException {
+		String pruningMethodName = this.getPruningMethod().getSelectedTag().getReadable();
+		if (!OCCTPruningMethodFactory.isValidPruningMethodType(pruningMethodName)) {
+			throw new IllegalArgumentException(pruningMethodName);
+		}
+		return OCCTPruningMethodFactory.getPruner(pruningMethodName, this.getPruningThreshold(),
+				allData, attributesOfB);
+	}
+
 	/**
 	 * Generates the classifier.
 	 *
@@ -365,32 +427,23 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 */
 	@Override
 	public void buildClassifier(Instances instances) throws Exception {
-
-		Instances instancesWithClass;
 		// can classifier handle the data?
 		this.getCapabilities().testWithFail(instances);
 		// In case there is no class attribute - let's add it manually before starting working with
 		// the instances
 		if (this.shouldAddClassAttribute) {
-			instancesWithClass = this.addClassAttribute(instances);
-		} else {
-			instancesWithClass = instances;
+			instances = this.addClassAttribute(instances);
 		}
 		// Let's assure the attribute index is valid
 		List<Attribute> attributesOfB = this.checkAndGetAttributesOfB(instances);
-
-		String splitSelectionMethodName = getSplitCriteria().getSelectedTag().getReadable();
-
-		OCCTSplitModelSelection modelSelection =
-				new OCCTSplitModelSelection(splitSelectionMethodName, instancesWithClass,
-						attributesOfB,
-						instancesWithClass.classIndex() != -1?
-								instancesWithClass.classAttribute() : null);
-		this.m_root = new OCCTInternalClassifierNode(modelSelection);
+		// Initialize the model selection method according to the required split method
+		OCCTSplitModelSelection splitMethod = this.getSplitMethod(instances, attributesOfB);
+		OCCTGeneralPruningMethod pruningMethod = this.getPruner(instances, attributesOfB);
+		this.m_root = new OCCTInternalClassifierNode(splitMethod, pruningMethod);
 		// Now, build the tree using the instances
-		this.m_root.buildClassifier(instancesWithClass);
+		this.m_root.buildClassifier(instances);
 		// Finally, perform a cleanup to save memory
-		modelSelection.cleanup();
+		splitMethod.cleanup();
 	}
 
 	/**

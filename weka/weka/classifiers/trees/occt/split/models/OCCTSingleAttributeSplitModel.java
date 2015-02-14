@@ -33,9 +33,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
     protected List<Attribute> m_possibleAttributes;
     protected List<Attribute> m_attributesOfB;
 
-    public static Comparator<Double> m_scoresComparator;
-
-    public static String NAME = "";
+    public static Comparator<Double> SCORES_COMPARATOR;
 
     public OCCTSingleAttributeSplitModel(Attribute splittingAttribute,
                                          List<Attribute> possibleAttributes,
@@ -44,10 +42,6 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
         this.m_splittingAttribute = splittingAttribute;
         this.m_attributesOfB = attributesOfB;
         this.m_possibleAttributes = possibleAttributes;
-    }
-
-    public int getSplittingAttributeIndex() {
-        return this.m_splittingAttribute.index();
     }
 
     /**
@@ -66,7 +60,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
         Enumeration attributes = instance.enumerateAttributes();
         while (attributes.hasMoreElements()) {
             Attribute currentAttr = (Attribute) attributes.nextElement();
-            if (this.m_splittingAttribute.equals(currentAttr)) {
+            if (currentAttr.equals(this.m_splittingAttribute)) {
                 if (includeSplittingAttribute) {
                     toReturn.append(instance.toString(currentAttr));
                 }
@@ -165,7 +159,11 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
     }
 
     /**
-     * Creates weka.trees.classifiers.occt.split on enumerated attribute.
+     * Returns the score of the model for a nominal attribute, calculated for specific data
+     *
+     * @param trainInstances The instances for which the split score should be calculated
+     *
+     * @return The calculated score
      *
      * @exception Exception if something goes wrong
      */
@@ -230,6 +228,11 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
         }
     }
 
+    public int getSplittingAttributeIndex() {
+        return this.m_splittingAttribute.index();
+    }
+
+    @Override
     public double score() {
         return this.m_splittingScore;
     }

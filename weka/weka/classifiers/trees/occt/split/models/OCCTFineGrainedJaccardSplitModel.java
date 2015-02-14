@@ -27,7 +27,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     private static final long serialVersionUID = -1537257016438337444L;
 
     static {
-        OCCTFineGrainedJaccardSplitModel.m_scoresComparator =
+        OCCTFineGrainedJaccardSplitModel.SCORES_COMPARATOR =
                 OCCTSplitModelComparators.LOWEST_SCORE_CHOOSER;
     }
 

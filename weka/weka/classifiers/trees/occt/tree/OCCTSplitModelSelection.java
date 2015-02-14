@@ -2,7 +2,7 @@ package weka.classifiers.trees.occt.tree;
 
 import weka.classifiers.trees.j48.ClassifierSplitModel;
 import weka.classifiers.trees.j48.ModelSelection;
-import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelFactory;
+import weka.classifiers.trees.occt.split.general.OCCTSplitModelFactory;
 import weka.classifiers.trees.occt.split.models.OCCTNoSplitModel;
 import weka.classifiers.trees.occt.split.models.OCCTSingleAttributeSplitModel;
 import weka.classifiers.trees.occt.split.models.OCCTSplitModel;
@@ -32,7 +32,7 @@ public class OCCTSplitModelSelection extends ModelSelection {
     /** All the training data */
     private Instances m_allData;
 
-    /** The attributes which can be used for weka.trees.classifiers.occt.split **/
+    /** The attributes which can be used for the split **/
     private List<Attribute> m_possibleAttributes;
     private List<Attribute> m_attributesOfB;
 
@@ -63,6 +63,7 @@ public class OCCTSplitModelSelection extends ModelSelection {
             throws IllegalArgumentException {
         this.m_splitCriterionType = splitCriterionType;
         if (!OCCTSplitModelFactory.isValidSplitModelType(this.m_splitCriterionType)) {
+            System.out.println("illegal");
             throw new IllegalArgumentException(splitCriterionType);
         }
         this.m_allData = allData;
@@ -137,7 +138,7 @@ public class OCCTSplitModelSelection extends ModelSelection {
     }
 
     /**
-     * Selects a weka.trees.classifiers.occt.split for the given dataset.
+     * Selects a split for the given dataset.
      */
     public final OCCTSplitModel selectModel(Instances data) throws Exception {
         // TODO: Check if all Instances belong to one class or if not enough Instances to split

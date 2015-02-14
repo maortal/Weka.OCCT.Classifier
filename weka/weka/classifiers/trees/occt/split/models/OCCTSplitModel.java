@@ -22,4 +22,8 @@ public abstract class OCCTSplitModel extends ClassifierSplitModel {
     public Attribute getChosenAttribute() {
         return null;
     }
+
+    public double score() {
+        return 0;
+    }
 }

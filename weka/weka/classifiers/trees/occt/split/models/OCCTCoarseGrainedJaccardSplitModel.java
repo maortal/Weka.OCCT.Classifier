@@ -5,7 +5,10 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sepetnit on 12/20/2014.
@@ -24,7 +27,7 @@ public class OCCTCoarseGrainedJaccardSplitModel extends OCCTSingleAttributeSplit
     private static final long serialVersionUID = 5232633291775764495L;
 
     static {
-        m_scoresComparator =
+        OCCTCoarseGrainedJaccardSplitModel.SCORES_COMPARATOR =
                 OCCTSplitModelComparators.LOWEST_SCORE_CHOOSER;
     }
 

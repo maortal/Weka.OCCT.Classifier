@@ -27,7 +27,7 @@ public class OCCTLeafNode implements Serializable {
     private List<Attribute> selectedAttributes;
 
     private boolean m_performFeatureSelection;
-    private Attribute selectedSplittingAttribute;
+    private Attribute m_selectedSplittingAttribute;
     private ProbModelsHandler m_probModels;
 
     private List<Attribute> m_attributesOfB;
@@ -52,13 +52,12 @@ public class OCCTLeafNode implements Serializable {
     public OCCTLeafNode(List<Attribute> attributesOfB,
                         Attribute selectedSplittingAttribute) {
         this(attributesOfB, true);
-        this.selectedSplittingAttribute = selectedSplittingAttribute;
+        this.m_selectedSplittingAttribute = selectedSplittingAttribute;
     }
 
     public void buildLeaf(Instances instances) throws Exception {
-        System.out.println("A");
-        System.out.println(instances);
-        if (this.m_performFeatureSelection) {
+        // TODO: selected attribute can be null (if the root is a leaf)
+        if (this.m_performFeatureSelection && this.m_selectedSplittingAttribute != null) {
             this.selectedAttributes = this.selectFeatures(instances);
         } else {
             this.selectedAttributes = this.m_attributesOfB;
@@ -71,7 +70,7 @@ public class OCCTLeafNode implements Serializable {
     public String toString() {
         List<String> names = new ArrayList<String>(this.selectedAttributes.size());
         for (Attribute attribute : this.selectedAttributes) {
-            if (!attribute.equals(this.selectedSplittingAttribute)) {
+            if (!attribute.equals(this.m_selectedSplittingAttribute)) {
                 names.add(attribute.name());
             }
         }
@@ -140,9 +139,9 @@ public class OCCTLeafNode implements Serializable {
     }
 
     private List<Attribute> selectFeaturesEx(Instances instances) throws Exception {
-        instances.setClass(this.selectedSplittingAttribute);
+        instances.setClass(this.m_selectedSplittingAttribute);
         Instances withOnlyNecessaryAttributes =
-                this.removeAttributesOfA(instances, this.selectedSplittingAttribute);
+                this.removeAttributesOfA(instances, this.m_selectedSplittingAttribute);
         AttributeSelection filter = new AttributeSelection();
         ASEvaluation evaluator = new CfsSubsetEval();
         ASSearch search = new BestFirst();
@@ -155,7 +154,7 @@ public class OCCTLeafNode implements Serializable {
         Enumeration attributesEnum = withSelectedAttributes.enumerateAttributes();
         while (attributesEnum.hasMoreElements()) {
             Attribute currentAttribute = (Attribute)attributesEnum.nextElement();
-            if (!currentAttribute.equals(this.selectedSplittingAttribute)) {
+            if (!currentAttribute.equals(this.m_selectedSplittingAttribute)) {
                 toReturn.add(currentAttribute);
             }
         }
