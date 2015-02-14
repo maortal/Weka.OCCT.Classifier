@@ -8,6 +8,4 @@ import weka.classifiers.Classifier;
  */
 public interface ProbModelBasicCreator {
     public Classifier getClassifierForProbModel();
-
-
 }

@@ -104,7 +104,7 @@ public class ProbModelsHandler implements Serializable {
     }
 
     private double calculateLValueForSingleInstanceEx(Instances allInstances,
-                                                   Instance currentInstance) throws Exception {
+                                                      Instance currentInstance) throws Exception {
         double toReturn = 0;
         // Build the models if the user forgot to call the buildModels() method
         if (!this.m_built) {
@@ -115,6 +115,7 @@ public class ProbModelsHandler implements Serializable {
             Classifier currentClassifier = entry.getValue();
             allInstances.setClass(currentAttribute);
             double[] dist = currentClassifier.distributionForInstance(currentInstance);
+            System.out.println("******** dist is " + Arrays.toString(dist));
             System.out.println(Arrays.toString(dist));
             System.out.println(currentAttribute);
             System.out.println(currentInstance.stringValue(currentAttribute));
@@ -146,7 +147,6 @@ class SerializableBasicModelsCreator implements ProbModelBasicCreator, Serializa
 
     private static final long serialVersionUID = -4425482033289259153L;
 
-    @Override
     public Classifier getClassifierForProbModel() {
         J48 currentActualClassifier = new J48();
         currentActualClassifier.setUseLaplace(true);

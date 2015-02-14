@@ -44,7 +44,7 @@ public class OCCTPruningMethodFactory {
     static {
         // Add an empty pruning method (no pruning)
         // TODO: Maybe unify this string with strings in OCCT ...
-        OCCTPruningMethodFactory.VALID_PRUNING_METHODS.put("nopruning", null);
+        OCCTPruningMethodFactory.VALID_PRUNING_METHODS.put("no", null);
         OCCTPruningMethodFactory.addClass(OCCTLeastProbableIntersectionsPruning.class);
         OCCTPruningMethodFactory.addClass(OCCTMaximumLikelihoodEstimationPruning.class);
     }

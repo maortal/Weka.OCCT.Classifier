@@ -39,7 +39,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	private OCCTInternalClassifierNode m_root;
 
 	// Whether a class attribute should be added to the instances prior to building a classifier
-	private boolean shouldAddClassAttribute;
+	private boolean m_shouldAddClassAttribute;
 
 	/** split criteria: Coarse-Grained Jaccard */
 	public static final int SPLIT_CGJ = 0;
@@ -81,9 +81,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	/** The first index of the sensitive attributes table (T_B). */
 	private SingleIndex m_FirstAttributeIndexOfB = new SingleIndex("last");
 
-	public OCCT(boolean shouldAddClassAttribute) {
+	public OCCT(boolean m_shouldAddClassAttribute) {
 		super();
-		this.shouldAddClassAttribute = shouldAddClassAttribute;
+		this.m_shouldAddClassAttribute = m_shouldAddClassAttribute;
 	}
 
 	public OCCT() {
@@ -343,14 +343,19 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		return result;
 	}
 
+	private Add createMatchUnmatchAddingFilter(Instances instances) throws Exception {
+		Add add = new Add();
+		add.setAttributeIndex("last");
+		add.setNominalLabels("Match,Unmatch");
+		add.setAttributeName(OCCT.FAKE_MATCH_FIELD_ATTRIBUTE_NAME);
+		add.setInputFormat(instances);
+		return add;
+	}
+
 	private Instances addClassAttribute(Instances instances) throws Exception {
 		// Add only if doesn't exist
 		if (instances.attribute(OCCT.FAKE_MATCH_FIELD_ATTRIBUTE_NAME) == null) {
-			Add add = new Add();
-			add.setAttributeIndex("last");
-			add.setNominalLabels("Match,Unmatch");
-			add.setAttributeName(OCCT.FAKE_MATCH_FIELD_ATTRIBUTE_NAME);
-			add.setInputFormat(instances);
+			Add add = this.createMatchUnmatchAddingFilter(instances);
 			instances = Filter.useFilter(instances, add);
 		}
 		// In any case, the class attribute is the fake one
@@ -370,7 +375,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		// The last possible index
 		int lastIndex = instances.numAttributes() - 1;
 		// In case there is a fake class attribute - we shouldn't include it
-		if (this.shouldAddClassAttribute) {
+		if (this.m_shouldAddClassAttribute) {
 			lastIndex--;
 		}
 		try {
@@ -431,7 +436,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		this.getCapabilities().testWithFail(instances);
 		// In case there is no class attribute - let's add it manually before starting working with
 		// the instances
-		if (this.shouldAddClassAttribute) {
+		if (this.m_shouldAddClassAttribute) {
 			instances = this.addClassAttribute(instances);
 		}
 		// Let's assure the attribute index is valid
@@ -454,6 +459,17 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @throws Exception if instance can't be classified successfully
 	 */
 	public final double classifyInstance(Instance instance) throws Exception {
+		Instances dataset = instance.dataset();
+		// In case there is no class attribute - let's add it manually before starting working with
+		// the instances
+		if (this.m_shouldAddClassAttribute) {
+			Instances updatedDataset = this.addClassAttribute(dataset);
+			if (updatedDataset != dataset) {
+				instance.setDataset(null);
+				instance.insertAttributeAt(instance.numAttributes());
+				instance.setDataset(updatedDataset);
+			}
+		}
 		System.out.println("Called classifier ... with " + instance.classIndex());
 		System.out.println("Called classifier ... with " + instance);
 		double value = this.m_root.classifyInstance(instance);
