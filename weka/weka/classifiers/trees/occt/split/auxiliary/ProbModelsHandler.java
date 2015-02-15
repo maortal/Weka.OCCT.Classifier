@@ -12,6 +12,7 @@ import weka.filters.unsupervised.attribute.Remove;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ public class ProbModelsHandler implements Serializable {
         // Find all the indexes of B's attributes (perform this a single time)
         this.m_attributesToBuildFromIndexes = new int[this.m_attributesToBuildFrom.size()];
         for (Attribute attribute : this.m_attributesToBuildFrom) {
+            System.out.println("Will build from " + attribute.index());
             this.m_attributesToBuildFromIndexes[index++] = attribute.index();
         }
     }
@@ -115,15 +117,17 @@ public class ProbModelsHandler implements Serializable {
             Classifier currentClassifier = entry.getValue();
             allInstances.setClass(currentAttribute);
             double[] dist = currentClassifier.distributionForInstance(currentInstance);
-            System.out.println("******** dist is " + Arrays.toString(dist));
+            System.out.println("******** dist is " + Arrays.toString(dist) + "******** ");
             System.out.println(Arrays.toString(dist));
             System.out.println(currentAttribute);
+            System.out.println(currentInstance);
+            System.out.println(currentAttribute.index());
             System.out.println(currentInstance.stringValue(currentAttribute));
             int valueIndex = currentAttribute.indexOfValue(
                     currentInstance.stringValue(currentAttribute));
             toReturn += Math.log10(dist[valueIndex]);
         }
-        return toReturn;
+        return Math.abs(toReturn);
     }
 
     public double calculateLValueForSingleInstance(Instances allInstances,

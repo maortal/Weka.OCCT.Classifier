@@ -281,8 +281,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     private void buildLeaf(Instances instances) throws Exception {
         this.m_isLeaf = true;
         // TODO? Do we really need this?
-        if (Utils.eq(instances.sumOfWeights(), 0)) {
-            System.out.println("empty");
+        if (instances.numInstances() == 0) {
             this.m_isEmpty = true;
         } else {
             // We reach a leaf - thus, models for that leaf should be created
@@ -365,7 +364,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     }
 
     /**
-     * Returns number of nodes in weka.trees.classifiers.occt.split.tree structure.
+     * Returns number of nodes in tree structure (leafs are not included)
      *
      * @return the number of nodes
      */
@@ -428,6 +427,8 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
                     }
                     text.append(this.m_localModel.leftSide(this.m_train));
                     text.append(rightSide);
+                    text.append(": ");
+                    text.append(Utils.doubleToString(this.m_localModel.score(), 3));
                     currentSon.dumpTree(depth + 1, text);
                 }
             }
@@ -435,26 +436,26 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     }
 
     /**
-     * Prints weka.trees.classifiers.occt.split.tree structure.
+     * Returns a string representation of the tree
      *
-     * @return the weka.trees.classifiers.occt.split.tree structure
+     * @return the tree structure
      */
     @Override
     public String toString() {
         try {
             MyStringBuffer text = new MyStringBuffer();
             this.dumpTree(0, text);
-            text.append("\n\nNumber of Leaves : \t", this.getLeavesCount(), "\n");
-            text.append("\nSize of the weka.trees.classifiers.occt.split.tree : \t", this.getNodesCount(), "\n");
+            text.append("\n\nTree size (total number of nodes):\t", this.getNodesCount(), "\n");
+            text.append("\nLeaves (number of predictor nodes)\t", this.getLeavesCount(), "\n");
             return text.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Can't print classification weka.trees.classifiers.occt.split.tree.";
+            return "Can't print classification tree.";
         }
     }
 
     /**
-     * Assigns a uniqe id to every node in the tree.
+     * Assigns a unique id to every node in the tree.
      *
      * @param lastID the last ID that was assign
      * @return the new current ID

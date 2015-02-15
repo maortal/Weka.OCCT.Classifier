@@ -76,11 +76,6 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
             System.out.println("num: " + instances.numInstances() + " total " + totalInstancesCount + " oi " + oi);
             toReturn -= Math.pow(instances.numInstances() / (double)totalInstancesCount, oi);
         }
-        System.out.println("toreturn " + toReturn);
-        /*if (instance.toString().equals("Afternoon,Friday,Berlin,Berlin,private")) {
-            System.out.println("Oi is " + oi);
-            System.out.println("P is " + toReturn);
-        }*/
         return toReturn;
     }
 
@@ -106,15 +101,11 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
                 //        currentInstance.toString(currentInstance.numAttributes() - 1);
                 // Use all attributes, including the splitting attribute
                 String currentInstanceStr = this.buildAttrValuesString(currentInstance, true);
-                System.out.println(currentInstanceStr + " " +
-                        distinctStringRepresentations.contains(currentInstanceStr));
-                //System.out.println(currentInstance.toString());
                 // Calculate if required
                 if (!distinctStringRepresentations.contains(currentInstanceStr)) {
                     lambdaValue +=
                             this.calculateSingleProbability(currentInstance, allInstancesSets);
                     distinctStringRepresentations.add(currentInstanceStr);
-                    System.out.println(Arrays.toString(distinctStringRepresentations.toArray()));
                 }
             }
         }

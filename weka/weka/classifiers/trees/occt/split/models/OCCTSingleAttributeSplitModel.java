@@ -190,7 +190,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
                 toReturn += weight * this.calculateSplitScore(instancesSetsToCompare);
             }
         }
-        System.out.println("Overall weka.trees.classifiers.occt.split score for " + this.m_splittingAttribute.name() + " is " + toReturn);
+        System.out.println("Overall split score for " + this.m_splittingAttribute.name() + " is " + toReturn);
         return toReturn;
     }
 
@@ -262,9 +262,9 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
     public String rightSide(int index, Instances data) {
         StringBuilder toReturn = new StringBuilder();
         if (this.m_splittingAttribute.isNominal()) {
-            toReturn.append("'= ");
+            toReturn.append(" = ");
             toReturn.append(this.m_splittingAttribute.value(index));
-            toReturn.append("'");
+            toReturn.append("");
         } else if (this.m_splittingAttribute.isNumeric()) {
             //throw new NotImplementedException();
         }

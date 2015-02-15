@@ -56,7 +56,6 @@ public class OCCTPruningMethodFactory {
 
     public static boolean isValidPruningMethodType(String criterion) {
         String nameToLookFor = OCCTPruningMethodFactory.extractPruningMethodName(criterion);
-        System.out.println("looking for " + nameToLookFor);
         return OCCTPruningMethodFactory.VALID_PRUNING_METHODS.containsKey(nameToLookFor);
     }
 

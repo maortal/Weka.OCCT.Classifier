@@ -3,6 +3,7 @@ package weka.classifiers.trees;
 import weka.classifiers.Classifier;
 import weka.classifiers.trees.occt.split.general.OCCTPruningMethodFactory;
 import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
+import weka.classifiers.trees.occt.tree.OCCTCardinalityHandler;
 import weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode;
 import weka.classifiers.trees.occt.tree.OCCTSplitModelSelection;
 import weka.core.Attribute;
@@ -46,6 +47,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 
 	// Whether a class attribute should be added to the instances prior to building a classifier
 	private boolean m_shouldAddClassAttribute;
+
+	private OCCTCardinalityHandler m_cardinalityHandler;
 
 	/** split criteria: Coarse-Grained Jaccard */
 	public static final int SPLIT_CGJ = 0;
@@ -92,6 +95,12 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	public OCCT(boolean m_shouldAddClassAttribute) {
 		super();
 		this.m_shouldAddClassAttribute = m_shouldAddClassAttribute;
+		if (!this.m_shouldAddClassAttribute) {
+			if (this.getDebug()) {
+				System.out.println("WARNING: There is a possibility for a bug.\n"
+					+ "Currently, a last IsMatch attribute must exist in the dataset");
+			}
+		}
 	}
 
 	public OCCT() {
@@ -481,8 +490,21 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		this.m_root = new OCCTInternalClassifierNode(splitMethod, pruningMethod);
 		// Now, build the tree using the instances
 		this.m_root.buildClassifier(instances);
+		// Initialize the cardinality handler
+		this.buildCardinalityHandler(instances);
 		// Finally, perform a cleanup to save memory
 		splitMethod.cleanup();
+		this.m_cardinalityHandler.cleanup();
+	}
+
+	private void buildCardinalityHandler(Instances instances) {
+		this.m_cardinalityHandler = new OCCTCardinalityHandler(instances,
+				this.m_FirstAttributeIndexOfB.getIndex(),
+				false);
+		if (this.m_shouldAddClassAttribute) {
+			this.m_cardinalityHandler.setExceptionAttributesOfB(instances.classAttribute());
+		}
+		this.m_cardinalityHandler.buildCardinality();
 	}
 
 	/**
@@ -507,10 +529,24 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		}
 		System.out.println("Called classifier ... with " + instance.classIndex());
 		System.out.println("Called classifier ... with " + instance);
-		double value = this.m_root.classifyInstance(instance);
-		System.out.println("Value is " + value);
+		double cardinalityValue = this.m_cardinalityHandler.getCardinalityValue(instance);
+		double clearValue = this.m_root.classifyInstance(instance);
+		double resultValue = clearValue * cardinalityValue;
 		Attribute isMatchAttr = instance.classAttribute();
-		return value >= linkageThreshold?
+		// Print some debug information if required
+		if (this.m_Debug) {
+			System.out.println("1. Cardinality					: " + cardinalityValue);
+			System.out.println("2. Value (no Cardinality)		: " + clearValue);
+			System.out.println("3. Value (Total)				: " + resultValue);
+			Attribute classAttr = instance.classAttribute();
+			String isMatch = classAttr.value(
+					resultValue >= linkageThreshold ?
+							isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME) :
+							isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME));
+			System.out.println("4. Threshold is					: " + linkageThreshold);
+			System.out.println("5. Match/UnMatch				: " + isMatch);
+		}
+		return resultValue >= linkageThreshold?
 				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME):
 				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME);
 	}
@@ -577,7 +613,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	public static void main(String [] argv) throws IOException {
 		// load data
 		BufferedReader reader = new BufferedReader(
-				new FileReader(new File(argv[0], "database_misuse_example_1.arff")));
+				new FileReader(new File(argv[0], "database_misuse_example_with_match.arff")));
 		Instances data = new Instances(reader);
 		reader.close();
 
@@ -585,7 +621,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		/// data.setClassIndex(data.numAttributes() - 1);
 
 		// Train OCCT (don't add any fake class attribute)
-		OCCT occt = new OCCT(false);
+		OCCT occt = new OCCT(true);
+		occt.setDebug(true);
 		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
 		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_MLE, OCCT.TAGS_PRUNING_METHOD));
@@ -593,10 +630,13 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		occt.setPruningThreshold(100.0);
 		// Make the attributes of B be: "City", "CustomerTypeDesc" (+1 since indexes are 1-based)
 		occt.setFirstAttributeIndexOfB((data.attribute("City").index() + 1) + "");
-
+		occt.setLinkageThreshold(1.0);
 		try {
 			occt.buildClassifier(data);
 			System.out.println(occt.toString());
+			System.out.println("Classification: " +
+					occt.classifyInstance(data.firstInstance()));
+
 			//System.out.println(occt.graph()); //graph dot file test
 		} catch (Exception e) {
 			e.printStackTrace();

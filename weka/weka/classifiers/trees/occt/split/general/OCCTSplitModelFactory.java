@@ -51,9 +51,7 @@ public class OCCTSplitModelFactory {
     }
 
     public static boolean isValidSplitModelType(String criterion) {
-        System.out.println("criterion is " + criterion);
         String nameToLookFor = OCCTSplitModelFactory.extractModelName(criterion);
-        System.out.println(nameToLookFor);
         return OCCTSplitModelFactory.VALID_SPLIT_MODELS.containsKey(nameToLookFor);
     }
 
