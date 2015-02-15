@@ -22,6 +22,10 @@ import weka.core.Utils;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -555,15 +559,6 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		return RevisionUtils.extract("$Revision: 1.9 $");
 	}
 
-    /**
-     * Main method.
-     *
-     * @param args the options for the classifier
-     */
-    public static void main(String[] args) {
-        runClassifier(new OCCT(false), args);
-    }
-
     @Override
     public int graphType() {
         return Drawable.TREE;
@@ -574,4 +569,38 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
         return m_root.graph();
     }
 
+	/**
+	 * Main method for testing this class
+	 *
+	 * @param argv the commandline options
+	 */
+	public static void main(String [] argv) throws IOException {
+		// load data
+		BufferedReader reader = new BufferedReader(
+				new FileReader(new File(argv[0], "database_misuse_example_1.arff")));
+		Instances data = new Instances(reader);
+		reader.close();
+
+		// Setting class attribute
+		/// data.setClassIndex(data.numAttributes() - 1);
+
+		// Train OCCT (don't add any fake class attribute)
+		OCCT occt = new OCCT(false);
+		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
+		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
+		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_MLE, OCCT.TAGS_PRUNING_METHOD));
+		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_LPI, OCCT.TAGS_PRUNING_METHOD));
+		occt.setPruningThreshold(100.0);
+		// Make the attributes of B be: "City", "CustomerTypeDesc" (+1 since indexes are 1-based)
+		occt.setFirstAttributeIndexOfB((data.attribute("City").index() + 1) + "");
+
+		try {
+			occt.buildClassifier(data);
+			System.out.println(occt.toString());
+			//System.out.println(occt.graph()); //graph dot file test
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
 }
