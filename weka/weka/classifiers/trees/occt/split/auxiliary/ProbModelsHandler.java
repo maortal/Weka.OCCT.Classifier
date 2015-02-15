@@ -127,7 +127,7 @@ public class ProbModelsHandler implements Serializable {
                     currentInstance.stringValue(currentAttribute));
             toReturn += Math.log10(dist[valueIndex]);
         }
-        return Math.abs(toReturn);
+        return toReturn;
     }
 
     public double calculateLValueForSingleInstance(Instances allInstances,

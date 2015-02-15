@@ -531,7 +531,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		System.out.println("Called classifier ... with " + instance);
 		double cardinalityValue = this.m_cardinalityHandler.getCardinalityValue(instance);
 		double clearValue = this.m_root.classifyInstance(instance);
-		double resultValue = clearValue * cardinalityValue;
+		double resultValue = Math.abs(clearValue * cardinalityValue);
 		Attribute isMatchAttr = instance.classAttribute();
 		// Print some debug information if required
 		if (this.m_Debug) {

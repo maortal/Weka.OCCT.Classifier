@@ -254,7 +254,6 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
             return this.m_leafModel.classifyInstance(instance);
         }
         Attribute chosen = this.getChosenAttribute();
-        System.out.println("Chosen value " + instance.stringValue(chosen));
         OCCTInternalClassifierNode relevantSon = this.m_sons.get(instance.stringValue(chosen));
         return relevantSon.classifyInstance(instance);
     }
