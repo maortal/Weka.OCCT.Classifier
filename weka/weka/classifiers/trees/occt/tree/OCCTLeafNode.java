@@ -182,7 +182,7 @@ public class OCCTLeafNode implements Serializable {
      *
      * @return The calculated value
      *
-     * @throws Exception If something bad occured
+     * @throws Exception If something bad occurred
      */
     public double classifyInstance(Instance instance) throws Exception {
         return this.m_probModels.calculateLValueForSingleInstance(instance);

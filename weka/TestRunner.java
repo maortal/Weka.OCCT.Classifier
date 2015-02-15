@@ -30,9 +30,9 @@ public class TestRunner {
 		// Train OCCT (don't add any fake class attribute)
 		OCCT occt = new OCCT(false);
 		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
-		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
+		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_MLE, OCCT.TAGS_PRUNING_METHOD));
-		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_LPI, OCCT.TAGS_PRUNING_METHOD));
+		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_LPI, OCCT.TAGS_PRUNING_METHOD));
 		occt.setPruningThreshold(100.0);
 		// Make the attributes of B be: "City", "CustomerTypeDesc" (+1 since indexes are 1-based)
 		occt.setFirstAttributeIndexOfB((data.attribute("City").index() + 1) + "");
@@ -44,6 +44,7 @@ public class TestRunner {
         } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
+
 		}
 	}
 }

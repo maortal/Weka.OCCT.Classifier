@@ -34,6 +34,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	private static final long serialVersionUID = 3850592762853236707L;
 
 	public static String FAKE_MATCH_FIELD_ATTRIBUTE_NAME = "IsMatch";
+	public static String FAKE_MATCH_FIELD_VALUE_MATCH_NAME = "Match";
+	public static String FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME = "UnMatch";
 
 	/** The decision tree */
 	private OCCTInternalClassifierNode m_root;
@@ -77,9 +79,11 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	/** The chosen pruning method (one from the 2 possible) **/
 	private int m_PruningMethod = PRUNING_NO_PRUNING;
 	/** The threshold for the pruning method (not always used) **/
-	private double m_pruningThreshold = 0;
+	private double m_pruningThreshold = 0.0;
 	/** The first index of the sensitive attributes table (T_B). */
 	private SingleIndex m_FirstAttributeIndexOfB = new SingleIndex("last");
+	/** The threshold for the final linkage step **/
+	public double m_linkageThreshold = 0.0;
 
 	public OCCT(boolean m_shouldAddClassAttribute) {
 		super();
@@ -201,8 +205,33 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @return tip text for this property suitable for displaying in the explorer/experimenter gui
 	 */
 	public String pruningThresholdTipText() {
-		return "The threshold for the pruning method. This threshold is not always required." +
+		return "The threshold for the pruning method (not always required)." +
 				"Please look on the tip-text of the pruning method.";
+	}
+
+	/**
+	 * Gets the linkage threshold to use.
+	 *
+	 * @return linkage threshold.
+	 */
+	public double getLinkageThreshold() {
+		return this.m_linkageThreshold;
+	}
+
+	/**
+	 * Sets the linkage threshold
+	 */
+	public void setLinkageThreshold(double linkageThreshold) {
+		this.m_linkageThreshold = linkageThreshold;
+	}
+
+	/**
+	 * Returns the tip text for this property
+	 *
+	 * @return tip text for this property suitable for displaying in the explorer/experimenter gui
+	 */
+	public String linkageThresholdTipText() {
+		return "The threshold for the final linkage step.";
 	}
 
 	/**
@@ -346,8 +375,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	private Add createMatchUnmatchAddingFilter(Instances instances) throws Exception {
 		Add add = new Add();
 		add.setAttributeIndex("last");
-		add.setNominalLabels("Match,Unmatch");
 		add.setAttributeName(OCCT.FAKE_MATCH_FIELD_ATTRIBUTE_NAME);
+		add.setNominalLabels(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME + "," +
+						OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME);
 		add.setInputFormat(instances);
 		return add;
 	}
@@ -459,6 +489,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @throws Exception if instance can't be classified successfully
 	 */
 	public final double classifyInstance(Instance instance) throws Exception {
+		double linkageThreshold = this.getLinkageThreshold();
 		Instances dataset = instance.dataset();
 		// In case there is no class attribute - let's add it manually before starting working with
 		// the instances
@@ -474,7 +505,10 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		System.out.println("Called classifier ... with " + instance);
 		double value = this.m_root.classifyInstance(instance);
 		System.out.println("Value is " + value);
-		return value > 0.5? 1: 0;
+		Attribute isMatchAttr = instance.classAttribute();
+		return value >= linkageThreshold?
+				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME):
+				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME);
 	}
 
 	/**
@@ -485,10 +519,16 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	 * @throws Exception if distribution can't be computed successfully
 	 */
 	public final double[] distributionForInstance(Instance instance) throws Exception {
-		double dist[] = new double[2];
-		double firstValue = this.classifyInstance(instance);
-		dist[0] = firstValue;
-		dist[1] = 1 - dist[0];
+		Attribute isMatchAttr = instance.classAttribute();
+		double dist[] = new double[isMatchAttr.numValues()];
+		int matchingValue = (int)this.classifyInstance(instance);
+		dist[matchingValue] = 1.0;
+		// All other values are 0
+		for (int i = 0; i < dist.length; ++i) {
+			if (i != matchingValue) {
+				dist[i] = 0;
+			}
+		}
 		return dist;
 	}
 

@@ -244,10 +244,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
      * @param data training set.
      */
     public String leftSide(Instances data) {
-        StringBuilder text = new StringBuilder();
-        text.append(this.m_splittingAttribute.name());
-        text.append(" = ");
-        return text.toString();
+        return this.m_splittingAttribute.name();
     }
 
     @Override
@@ -255,21 +252,23 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
         return this.rightSide(this.m_splittingAttribute.indexOfValue(value), data);
     }
 
-    @Override
     /**
      * Prints the condition satisfied by instances in a subset.
      *
      * @param index of subset
      * @param data training set.
      */
+    @Override
     public String rightSide(int index, Instances data) {
+        StringBuilder toReturn = new StringBuilder();
         if (this.m_splittingAttribute.isNominal()) {
-            return this.m_splittingAttribute.value(index);
+            toReturn.append("'= ");
+            toReturn.append(this.m_splittingAttribute.value(index));
+            toReturn.append("'");
         } else if (this.m_splittingAttribute.isNumeric()) {
             //throw new NotImplementedException();
         }
-        // TODO ...
-        return null;
+        return toReturn.toString();
     }
 
     /**

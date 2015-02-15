@@ -16,6 +16,7 @@ import weka.core.Utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,9 +246,10 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * @throws Exception if something goes wrong
      */
     public double classifyInstance(Instance instance) throws Exception {
+        /*
         if (this.m_isEmpty) {
             return 0.5;
-        }
+        }*/
         if (this.m_isLeaf) {
             return this.m_leafModel.classifyInstance(instance);
         }
@@ -331,6 +333,13 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
             for (int i = 0; i < localSplittedTrain.length; ++i) {
                 this.m_sons.put(chosenAttribute.value(i), this.getNewTree(localSplittedTrain[i]));
                 localSplittedTrain[i] = null;
+            }
+            Enumeration possibleValues = chosenAttribute.enumerateValues();
+            while (possibleValues.hasMoreElements()) {
+                String currentValue = (String)possibleValues.nextElement();
+                if (!this.m_sons.containsKey(currentValue)) {
+                    this.m_sons.put(currentValue, this.getNewTree(new Instances(instances, 0)));
+                }
             }
         } else {
             this.buildLeaf(instances);
