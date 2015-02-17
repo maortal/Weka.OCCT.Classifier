@@ -1,5 +1,6 @@
 package weka.classifiers.trees.occt.tree;
 
+import weka.classifiers.trees.occt.split.auxiliary.OCCTFeatureSelector;
 import weka.classifiers.trees.occt.split.models.OCCTSplitModel;
 import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
 import weka.classifiers.trees.occt.utils.MyStringBuffer;
@@ -82,6 +83,13 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      */
     protected OCCTSplitModel m_localModel;
 
+    /**
+     * Feature selector to execute on the leaf dataset in order to choose the attributes that will
+     * be represented.
+     */
+    protected OCCTFeatureSelector m_featureSelector;
+
+
     protected OCCTLeafNode m_leafModel;
 
     /**
@@ -96,6 +104,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         this.m_localModel = null;
         this.m_modelSelectionMethod = modelSelectionMethod;
         this.m_pruningMethod = pruningMethod;
+        this.m_featureSelector = null;
         // This is not a leaf until specified
         this.m_leafModel = null;
     }
@@ -277,21 +286,29 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         return newTree;
     }
 
-    private void buildLeaf(Instances instances) throws Exception {
+    private void buildLeaf(Instances instances, List<Attribute> selectedAttributesOfB)
+            throws Exception {
         this.m_isLeaf = true;
         // TODO? Do we really need this?
         if (instances.numInstances() == 0) {
             this.m_isEmpty = true;
         } else {
             // We reach a leaf - thus, models for that leaf should be created
-            // TODO: The attribute MUST be queried from the selection method
-            Attribute parentSplittingAttribute = null;
-            if (this.m_parent != null) {
-                parentSplittingAttribute = this.m_parent.getChosenAttribute();
-            }
-            this.m_leafModel = new OCCTLeafNode(this.m_modelSelectionMethod.getAttributesOfB(),
-                    parentSplittingAttribute);
+            this.m_leafModel =
+                    new OCCTLeafNode(this.m_modelSelectionMethod.getAttributesOfB(),
+                                     selectedAttributesOfB);
             this.m_leafModel.buildLeaf(instances);
+        }
+    }
+
+    private List<Attribute> getCurrentSelectedFeatures() {
+        if (this.m_parent == null || this.m_parent.m_featureSelector == null) {
+            return null;
+        }
+        try {
+            return this.m_parent.m_featureSelector.getSelectedFeatures();
+        } catch (IllegalStateException e) {
+            return null;
         }
     }
 
@@ -312,7 +329,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         // First, let's check if we should perform pruning here - without continuing to branch
         if (this.m_pruningMethod != null) {
             if (this.m_pruningMethod.shouldPrune(instances)) {
-                this.buildLeaf(instances);
+                this.buildLeaf(instances, this.getCurrentSelectedFeatures());
                 return;
             }
         }
@@ -322,6 +339,11 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         // is a leaf
         if (this.m_localModel.numSubsets() > 1) {
             Attribute chosenAttribute = this.m_localModel.getChosenAttribute();
+            // Select the features for the leaf dataset
+            this.m_featureSelector =
+                    new OCCTFeatureSelector(chosenAttribute,
+                                            this.m_modelSelectionMethod.getAttributesOfB(),
+                                            instances);
             // Perform the actual split
             Instances[] localSplittedTrain = this.m_localModel.split(instances);
             //((OCCTSingleAttributeSplitModel)this.m_localModel).splitInstances(instances);
@@ -340,7 +362,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
                 }
             }
         } else {
-            this.buildLeaf(instances);
+            this.buildLeaf(instances, this.getCurrentSelectedFeatures());
         }
     }
 
