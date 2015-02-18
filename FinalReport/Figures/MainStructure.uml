@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>weka.classifiers.trees.OCCT</OriginalElement>
+  <nodes>
+    <node x="197.125" y="257.0">weka.classifiers.trees.OCCT</node>
+    <node x="0.0" y="79.0">weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod</node>
+    <node x="112.47727272727275" y="0.0">weka.classifiers.trees.occt.tree.OCCTSplitModelSelection</node>
+    <node x="139.125" y="158.0">weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode</node>
+    <node x="40.125" y="158.0">weka.classifiers.Classifier</node>
+    <node x="220.0" y="79.0">weka.classifiers.trees.occt.tree.OCCTLeafNode</node>
+    <node x="355.0" y="79.0">weka.classifiers.trees.occt.split.models.OCCTSplitModel</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode" target="weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod">
+      <point x="-75.0" y="-14.5" />
+      <point x="154.125" y="138.0" />
+      <point x="94.0" y="138.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.OCCT" target="weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode">
+      <point x="-8.0" y="-14.5" />
+      <point x="221.125" y="227.0" />
+      <point x="184.125" y="227.0" />
+      <point x="-45.0" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode" target="weka.classifiers.trees.occt.tree.OCCTSplitModelSelection">
+      <point x="-15.0" y="-14.5" />
+      <point x="214.125" y="138.0" />
+      <point x="209.5" y="138.0" />
+      <point x="209.5" y="54.0" />
+      <point x="230.7772727272727" y="54.0" />
+      <point x="33.799999999999955" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.OCCT" target="weka.classifiers.trees.occt.tree.OCCTSplitModelSelection">
+      <point x="24.0" y="-14.5" />
+      <point x="253.125" y="237.0" />
+      <point x="486.5" y="237.0" />
+      <point x="486.5" y="54.0" />
+      <point x="264.57727272727277" y="54.0" />
+      <point x="67.60000000000002" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.Classifier" target="weka.classifiers.Classifier">
+      <point x="-19.75" y="14.5" />
+      <point x="59.875" y="207.0" />
+      <point x="20.125" y="207.0" />
+      <point x="20.125" y="172.5" />
+      <point x="-39.5" y="-0.0" />
+    </edge>
+    <edge source="weka.classifiers.trees.OCCT" target="weka.classifiers.Classifier">
+      <point x="-24.0" y="-14.5" />
+      <point x="205.125" y="237.0" />
+      <point x="99.375" y="237.0" />
+      <point x="19.75" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod" target="weka.classifiers.trees.occt.tree.OCCTSplitModelSelection">
+      <point x="-47.0" y="-14.5" />
+      <point x="47.0" y="54.0" />
+      <point x="129.37727272727273" y="54.0" />
+      <point x="-67.60000000000002" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode" target="weka.classifiers.trees.occt.split.models.OCCTSplitModel">
+      <point x="75.0" y="-14.5" />
+      <point x="304.125" y="138.0" />
+      <point x="415.5" y="138.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="weka.classifiers.trees.occt.tree.OCCTInternalClassifierNode" target="weka.classifiers.trees.occt.tree.OCCTLeafNode">
+      <point x="45.0" y="-14.5" />
+      <point x="274.125" y="128.0" />
+      <point x="306.25" y="128.0" />
+      <point x="28.75" y="14.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="244.0" y="203.5" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
