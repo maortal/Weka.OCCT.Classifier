@@ -62,10 +62,10 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
             Attribute currentAttr = (Attribute) attributes.nextElement();
             if (currentAttr.equals(this.m_splittingAttribute)) {
                 if (includeSplittingAttribute) {
-                    toReturn.append(instance.toString(currentAttr));
+                    toReturn.append(instance.stringValue(currentAttr));
                 }
             } else if (this.m_possibleAttributes.contains(currentAttr)) {
-                toReturn.append(instance.toString(currentAttr));
+                toReturn.append(instance.stringValue(currentAttr));
             }
         }
         return toReturn.toString();
