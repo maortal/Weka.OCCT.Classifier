@@ -91,6 +91,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	private SingleIndex m_FirstAttributeIndexOfB = new SingleIndex("last");
 	/** The threshold for the final linkage step **/
 	public double m_linkageThreshold = 0.0;
+	/** Whether the cardinality of a record from T_B is taken into consideration */
+	protected boolean m_useCardinality = false;
 
 	public OCCT(boolean m_shouldAddClassAttribute) {
 		super();
@@ -248,6 +250,37 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 	}
 
 	/**
+	 * Set cardinality mode
+	 *
+	 * @param useCardinality true if cardinality of records from T_B is taken into consideration
+	 */
+	public void setUseCardinality(boolean useCardinality) {
+
+		m_useCardinality = useCardinality;
+	}
+
+	/**
+	 * Get whether cardinality of records from T_B is taken into consideration
+	 *
+	 * @return true if cardinality of records from T_B is taken into consideration
+	 */
+	public boolean getUseCardinality() {
+
+		return m_useCardinality;
+	}
+
+	/**
+	 * Returns the tip text for this property
+	 *
+	 * @return tip text for this property suitable for displaying in the
+	 *         explorer/experimenter gui
+	 */
+	public String useCardinalityTipText() {
+		return "If set to true, the cardinality of records from table B is considered along with "
+				+ "the linkage threshold.";
+	}
+
+	/**
 	 * Returns an enumeration describing the available options.
 	 *
 	 * Valid options are:
@@ -282,6 +315,11 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 						"\t(default: 0)",
 				"R", 1, "-R <pruning threshold>"));
 
+		newVector.addElement(new Option(
+				"\tUse cardinality.\n"+
+						"\t(default: false)",
+				"C", 1, "-C <use cardinality>"));
+
 		return newVector.elements();
 	}
 
@@ -305,6 +343,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 
 		options.add("-R");
 		options.add("" + getPruningThreshold());
+
+		options.add("-C");
+		options.add("" + getUseCardinality());
 
 		return options.toArray(new String[options.size()]);
 	}
@@ -334,6 +375,7 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		} else {
 			this.setPruningMethod(new SelectedTag(PRUNING_NO_PRUNING, TAGS_PRUNING_METHOD));
 		}
+		setUseCardinality(Utils.getFlag('C', options));
 		// Other?
 		Utils.checkForRemainingOptions(options);
 	}
@@ -490,11 +532,15 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		this.m_root = new OCCTInternalClassifierNode(splitMethod, pruningMethod);
 		// Now, build the tree using the instances
 		this.m_root.buildClassifier(instances);
-		// Initialize the cardinality handler
-		this.buildCardinalityHandler(instances);
+		if (this.m_useCardinality) {
+			// Initialize the cardinality handler
+			this.buildCardinalityHandler(instances);
+		}
 		// Finally, perform a cleanup to save memory
 		splitMethod.cleanup();
-		this.m_cardinalityHandler.cleanup();
+		if (this.m_useCardinality) {
+			this.m_cardinalityHandler.cleanup();
+		}
 	}
 
 	private void buildCardinalityHandler(Instances instances) {
@@ -529,26 +575,32 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		}
 		System.out.println("Called classifier ... with " + instance.classIndex());
 		System.out.println("Called classifier ... with " + instance);
-		double cardinalityValue = this.m_cardinalityHandler.getCardinalityValue(instance);
+		// In case it is unnecessary to consider usage of cardinality, we set its value to 1 which
+		// allows to ignore the values
+		double cardinalityValue =
+				this.m_useCardinality? this.m_cardinalityHandler.getCardinalityValue(instance) : 1;
 		double clearValue = this.m_root.classifyInstance(instance);
 		double resultValue = Math.abs(clearValue * cardinalityValue);
 		Attribute isMatchAttr = instance.classAttribute();
+		int isMatch = resultValue >= linkageThreshold ?
+				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME) :
+				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME);
 		// Print some debug information if required
 		if (this.m_Debug) {
-			System.out.println("1. Cardinality					: " + cardinalityValue);
-			System.out.println("2. Value (no Cardinality)		: " + clearValue);
-			System.out.println("3. Value (Total)				: " + resultValue);
+			int printIndex = 1;
+			if (this.m_useCardinality) {
+				System.out.println((printIndex++) + ". Cardinality						: " + cardinalityValue);
+				System.out.println((printIndex++) + ". Value (no Cardinality)				: " + clearValue);
+				System.out.println((printIndex++) + ". Value (Total)					: " + resultValue);
+			} else {
+				System.out.println((printIndex++) + ". Value						: " + resultValue);
+			}
 			Attribute classAttr = instance.classAttribute();
-			String isMatch = classAttr.value(
-					resultValue >= linkageThreshold ?
-							isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME) :
-							isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME));
-			System.out.println("4. Threshold is					: " + linkageThreshold);
-			System.out.println("5. Match/UnMatch				: " + isMatch);
+			String isMatchAsString = classAttr.value(isMatch);
+			System.out.println((printIndex++) + ". Threshold						: " + linkageThreshold);
+			System.out.println((printIndex++) + ". Match/UnMatch					: " + isMatchAsString);
 		}
-		return resultValue >= linkageThreshold?
-				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_MATCH_NAME):
-				isMatchAttr.indexOfValue(OCCT.FAKE_MATCH_FIELD_VALUE_UNMATCH_NAME);
+		return isMatch;
 	}
 
 	/**
@@ -623,7 +675,8 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		// Train OCCT (don't add any fake class attribute)
 		OCCT occt = new OCCT(true);
 		occt.setDebug(true);
-		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
+		//occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
+		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_LPI, OCCT.TAGS_SPLIT_CRITERIA));
 		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_MLE, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_LPI, OCCT.TAGS_PRUNING_METHOD));
