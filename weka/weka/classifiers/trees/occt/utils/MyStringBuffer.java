@@ -1,10 +1,14 @@
 package weka.classifiers.trees.occt.utils;
 
+import java.io.Serializable;
+
 /**
  * Created by sepetnit on 03/01/15.
  *
  */
-public class MyStringBuffer {
+public class MyStringBuffer implements Serializable {
+    private static final long serialVersionUID = -4857228316948131004L;
+
     private StringBuffer m_internalStringBuffer;
 
     public MyStringBuffer() {
