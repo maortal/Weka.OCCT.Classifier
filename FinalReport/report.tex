@@ -15,6 +15,9 @@
 \usepackage{times}
 
 \newcommand{\newpar}{\smallskip\noindent} %command to create new paragraph with no ident.
+\newcommand{\commenter}[3]{$[$\uppercase{#1}#2:#3$]$  \\}
+\newcommand{\vitali}[2]{\commenter{vitali}{#1}{#2}}
+\newcommand{\maor}[2]{\commenter{maor}{#1}{#2}}
 %----------------------------------------------------------------------------------------
 %	DOCUMENT INFORMATION
 %----------------------------------------------------------------------------------------
@@ -104,8 +107,31 @@ evaluate OCCT.
 %	SECTION 3 - Code Structure
 %----------------------------------------------------------------------------------------
 \section{Code Structure}
-The code was carefully designed in order to be flexible for future extensions and also be as readable as possible.
-Its implementation is based on the J48, which is an open source Java implementation of the C4.5 algorithm in Weka.
+The code was carefully designed in order to be flexible for future extensions and also be as readable as possible. Its implementation is based on the J48, which is an open source Java implementation of the C4.5 algorithm in Weka.
+
+\subsection{Packages}
+The packages structure of the code can be seen in Figure \vitali{TODO}. This structure allows an easy merge process with the existing Weka source code. The parent packages are {\em src.main.java.weka} which is similar to Weka packages. Then, inside the {\em weka} package, there is {\em classifiers} package which contains different classifiers. Since our implementation was inspired from J48, we placed the main class in file {\em occt.java} inside {\em src.main.java.weka.trees.classifiers}. Other parts of the implementation are located inside {\em trees.occt} package.
+
+The {\em occt} package was divided to three packages: {\em split}, {\em tree} and {\em utils}. The first package, {\em split} contains all the parts of implementation which refer to the splitting criteria. There are several packages inside. We explain some of them below:
+\begin{description}
+  \item[general] Here we have general classes which helps us to access the spit criterions and pruning methods in a common way.
+  \item[iterators] This package contains classes to iterate over the instances in different ways, while calculating the splitting scores.
+  \item[models] This package contains an implementation of the four split criteria proposed in \cite{dror2011thesis} and \cite{dror2014occt}.
+  \item[pruning] Here we placed all the implementation of the two proposed pruning methods.
+\end{description}
+The {\em tree} package contains the implementation of the tree structure for representing internal nodes and leafs of the tree which are built during the training phase and queried during the testing phase. Finally, the {\em utils} package contains some general auxiliary classes which are used in the implementation.
+
+\subsection{How It Works?}
+Like in J48, the main class is called by the name of the algorithm - OCCT. The training is done via the {\em buildClassifier(Instances)} method which creates the root of the tree of the type {\em OCCTInternalClassifierNode} and calls its local {\em buildClassifier(Instances)} method.
+
+\subsubsection{General}
+The algorithm tries to recursively split the dataset contained in each node into subsets. Each internal node, represented by an instance of te {\em OCCTInternalClassifierNode} class, uses an attribute selection method (represented by the {\em OCCTSplitModelSelection} class), which tries to choose the best attribute for split. For this purpose, it evaluates the 'score' for each split (each attribute from $T_A$ defines a split) using an instance of {\em OCCTSingleAttributeSplitModel}.
+
+\subsubsection{Splitting}
+The split model can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}.
+
+\subsubsection{Leafs}
+Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and contains the built probabilistic models (which are represented by the {\em ProbModelsHandler} class). Also, as mentioned in \cite{dror2011thesis} and \cite{dror2014occt}, there is no need to save models for all possible attributes of $T_B$. Thus, a feature selection process is executed on the leaf dataset in order to choose the attributes that will be represented by the leafs. This is done by the {\em OCCTFeatureSelector} class which is instantiated for each internal node and extracts the attributes of leafs in case this node has leafs as children.
 
 \clearpage
 \subsection{Main structure}

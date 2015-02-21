@@ -15,6 +15,9 @@
 \usepackage{times}
 
 \newcommand{\newpar}{\smallskip\noindent} %command to create new paragraph with no ident.
+\newcommand{\commenter}[3]{$[$\uppercase{#1}#2:#3$]$  \\}
+\newcommand{\vitali}[2]{\commenter{vitali}{#1}{#2}}
+\newcommand{\maor}[2]{\commenter{maor}{#1}{#2}}
 %----------------------------------------------------------------------------------------
 %	DOCUMENT INFORMATION
 %----------------------------------------------------------------------------------------
@@ -24,9 +27,9 @@
 
 \begin{center}
 {\large Ben-Gurion University of the Negev \\ Faculty of Engineering Science \\ Department of Information Systems Engineering} \\
-\begin{spacing}{1.5}
 \vspace*{2mm}
-\textbf{Final Report} \\
+\begin{spacing}{1.5}
+\textbf{Final Report} \\ 
 {\LARGE \uppercase{OCCT: One-Class Clustering Tree \\ Implementation for Weka}}
 \end{spacing}
 \vspace*{2mm}
@@ -36,13 +39,12 @@
 \vspace*{2mm}
 \textbf{\date{\today}} % Date for the report
 \end{center}
-
 %----------------------------------------------------------------------------------------
 %	SECTION 1 - Introduction
 %----------------------------------------------------------------------------------------
-\begin{spacing}{1.5}
-
+\vspace*{-1.5cm}
 \section{Introduction}
+\begin{spacing}{1.5}
 Data linkage is the task of identifying different entries (i.e., data items) that refer to the same
 entity across different data sources \cite{damaging2011}, \cite{kamra2008detecting}. Record linkage refers to the task of joining datasets
 that do not share a common identifier (i.e., a foreign key).
@@ -105,8 +107,11 @@ evaluate OCCT.
 %	SECTION 3 - Code Structure
 %----------------------------------------------------------------------------------------
 \section{Code Structure}
-The code was carefully designed in order to be flexible for future extensions and also be as readable as possible.
-Its implementation is based on the J48, which is an open source Java implementation of the C4.5 algorithm in Weka.
+The code was carefully designed in order to be flexible for future extensions and also be as readable as possible. Its implementation is based on the J48, which is an open source Java implementation of the C4.5 algorithm in Weka.
+
+The packages structure of the code can be seen in Figure \vitali{TODO}. This structure allows an easy merge process with the existing Weka source code. The basic structure of Weka packages is {\em src.main.java.weka}. Then, inside the {\em weka} package, there is {\em classifiers} package which contains different classifiers. Since our implementation was inspired from J48, we placed the main class in the file {\em occt.java}. Other parts of the implementation are located inside the {\em trees.occt} package.
+
+
 
 \clearpage
 \subsection{Main structure}
@@ -131,9 +136,9 @@ The major drawback of OCCT which has not been overcame in the implementation is 
 
 There is still a lot of work that can be done in order to improve and extend the current implementation and allow it to be ran on more datasets. 
 
-First, as noted in \cite{dror2011thesis}, the proposed OCCT algorithm is only capable of handling discrete data. Thus, it cannot analyze attributes that consist of continuous values. In case a dataset with such an attribute is given as an input, some kind of discretization must be applied on the continues attributes in order to make them semi-nominal. In the current version of the implementation, Weka disables the possibility to ran the algorithm on datasets if they have at least on attribute that is not nominal. This is implemented by using the {\em Capabilities} class of Weka, which ensures that features (e.g. handling certain types of attributes) are enabled explicitly.
+First, as noted in \cite{dror2011thesis}, the proposed OCCT algorithm is only capable of handling discrete data. Thus, it cannot analyze attributes that consist of continuous values. In case either $T_A$ or $T_B$ has such attributes, some kind of discretization must be applied in order to make them semi-nominal. This discretization must be done during a preprocess step, before running OCCT. In the current version of the implementation, Weka disables the possibility to ran the algorithm on datasets if they have at least one attribute that is not nominal. This is implemented by using the {\em Capabilities} class of Weka, which ensures that features (e.g. handling certain types of attributes) are enabled explicitly. Our suggestion is to implement this missing functionality and allow OCCT to handle both continuous and discrete attributes. For example, handling continuous attributes can be implemented in the same way of C4.5, which creates a threshold and then splits the instances into those whose attribute value is above the threshold and those that are less than or equal to it.
 
-Other problem with the current implementation refers to the input format of the algorithm; currently, OCCT is referred as a classification algorithm, which means that it is located under 'Classifiers' in the 'Classify' tab of Weka and uses the common GUI of a classifier. However, OCCT purpose is solving data linkage problems. The uniqueness of these problems is receiving two datasets as an input and also irrelevant class attribute of the dataset. This type of input does not exist in the 'Classify' tab of the GUI chooser of Weka. Thus, we added an index which is given as an input, which defines the first column of $T_B$ in the input. Weka has an option of adding extra tabs in the Explorer in order to add new functionality without the hassle of having to dig into the Explore code. We suggest to add a new tab for data linkage algorithms. This tab should be similar to the Classify tab, but it will allow the user to choose two different datasets for $T_A$ and $T_B$.
+Other problem with the current implementation refers to the input format of the algorithm; currently, OCCT is referred as a classification algorithm, which means that it is located in the Classify tab of Weka and uses the common GUI of a classifier. However, OCCT purpose is solving data linkage problems. The uniqueness of these problems is receiving two datasets as an input and also irrelevant class attribute of the dataset. This type of input does not exist in the Classify tab of the GUI chooser of Weka. Currently, in order to overcome that problem of receiving two datasets as an input, we added an input index, which defines the first column of $T_B$ in the input. Since the input of the algorithm is a training set of only matching instances $T_AB \subseteq T_A \times T_B$, it is sufficient for now. However, Weka has an option of adding extra tabs in the Explorer in order to add new functionality without the hassle of having to dig into the code of the Explorer. We suggest to add a new tab for data linkage algorithms. This tab should be similar to the Classify tab, but it will allow the user to choose two different datasets for $T_A$ and $T_B$.
 
 %----------------------------------------------------------------------------------------
 \bibliographystyle{unsrt}
