@@ -24,8 +24,7 @@ import java.util.Map;
 
 
 /**
- * Class for handling a weka.trees.classifiers.occt.split.tree structure used for
- * classification.
+ * Class for handling a tree structure used for classification.
  *
  * @author sepetnit
  * @version $Revision: 1 $
@@ -219,33 +218,6 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         }
         return null;
     }
-
-    /**
-     * This Method just exists to make program easier to read.
-     *
-     * @return The son node at the given index
-     */
-    /*
-    private OCCTInternalClassifierNode son(int index) {
-
-        return m_sons[index];
-    }*/
-
-    /**
-     * Returns class probabilities for a weighted instance.
-     *
-     * @param instance the instance to get the distribution for
-     * @return the distribution
-     * @throws Exception if something goes wrong
-     */
-    /*
-    public final double[] distributionForInstance(Instance instance) throws Exception {
-        double [] doubles = new double[instance.numClasses()];
-        for (int i = 0; i < doubles.length; i++) {
-            doubles[i] = this.getProbabilityForClass(i, instance, 1);
-        }
-        return doubles;
-    }*/
 
     /**
      * Classifies an instance.
