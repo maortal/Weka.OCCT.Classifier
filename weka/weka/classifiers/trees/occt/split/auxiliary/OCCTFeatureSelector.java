@@ -24,7 +24,7 @@ import java.util.List;
 public class OCCTFeatureSelector implements Serializable {
 
     private static final long serialVersionUID = -2596337180687583510L;
-    
+
     private Attribute m_selectedSplittingAttribute;
     private List<Attribute> m_attributesOfB;
     private boolean m_isBuilt;
