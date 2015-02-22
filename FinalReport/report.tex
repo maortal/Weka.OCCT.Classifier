@@ -128,10 +128,12 @@ Like in J48, the main class is called by the name of the algorithm - OCCT. The t
 The algorithm tries to recursively split the dataset contained in each node into subsets. Each internal node, represented by an instance of te {\em OCCTInternalClassifierNode} class, uses an attribute selection method (represented by the {\em OCCTSplitModelSelection} class), which tries to choose the best attribute for split. For this purpose, it evaluates the 'score' for each split (each attribute from $T_A$ defines a split) using an instance of {\em OCCTSingleAttributeSplitModel}.
 
 \subsubsection{Splitting}
-The split model can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}.
+The split model can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}. The base class for all the split criteria is {\em OCCTSingleAttributeSplitModel}. This class contains methods for performing basic operations like calculating intersection and union between sets of instances which is required for some of the split criterions. \vitali{TO BE CONTINUED}.
 
 \subsubsection{Leafs}
 Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and contains the built probabilistic models (which are represented by the {\em ProbModelsHandler} class). Also, as mentioned in \cite{dror2011thesis} and \cite{dror2014occt}, there is no need to save models for all possible attributes of $T_B$. Thus, a feature selection process is executed on the leaf dataset in order to choose the attributes that will be represented by the leafs. This is done by the {\em OCCTFeatureSelector} class which is instantiated for each internal node and extracts the attributes of leafs in case this node has leafs as children.
+
+
 
 \clearpage
 \subsection{Main structure}
