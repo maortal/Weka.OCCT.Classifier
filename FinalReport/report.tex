@@ -11,8 +11,31 @@
 \usepackage{natbib} % Required to change bibliography style to ABB
 \usepackage[linesnumbered,ruled,vlined,algo2e]{algorithm2e} % Required for presenting algorithms
 \usepackage{setspace} % This is used in the title page
-
 \usepackage{times}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=single,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \newcommand{\newpar}{\smallskip\noindent} %command to create new paragraph with no ident.
 \newcommand{\commenter}[3]{$[$\uppercase{#1}#2:#3$]$  \\}
@@ -26,10 +49,11 @@
 \newgeometry{top=2cm, bottom=2cm, right=2cm, left=2cm}
 
 \begin{center}
+\includegraphics{Figures/bgu}\\
 {\large Ben-Gurion University of the Negev \\ Faculty of Engineering Science \\ Department of Information Systems Engineering} \\
 \vspace*{2mm}
 \begin{spacing}{1.5}
-\textbf{Final Report} \\ 
+\textbf{Final Report} \\
 {\LARGE \uppercase{OCCT: One-Class Clustering Tree \\ Implementation for Weka}}
 \end{spacing}
 \vspace*{2mm}
@@ -87,7 +111,7 @@ for developing new machine learning schemes.
 %	SECTION 2 - Motivation, Project Goals
 %----------------------------------------------------------------------------------------
 \section{Motivation}
-OCCT was evaluated by the authors in \cite{dror2011thesis} and \cite{dror2014occt} as a part of a detection system framework
+Dror et al.~\cite{dror2011thesis,dror2014occt} evaluated OCCT as a part of a detection system framework
 designed for detecting potential data leakage/misuse. The detection system was
 designed to incorporate multiple detectors as plug-ins, where each detector implements a
 different detection algorithm, such as OCCT.
@@ -127,6 +151,7 @@ Like in J48, the main class is called by the name of the algorithm - OCCT. The t
 \subsubsection{General}
 The algorithm tries to recursively split the dataset contained in each node into subsets. Each internal node, represented by an instance of te {\em OCCTInternalClassifierNode} class, uses an attribute selection method (represented by the {\em OCCTSplitModelSelection} class), which tries to choose the best attribute for split. For this purpose, it evaluates the 'score' for each split (each attribute from $T_A$ defines a split) using an instance of {\em OCCTSingleAttributeSplitModel}.
 
+
 \subsubsection{Splitting}
 The split model can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}. The base class for all the split criteria is {\em OCCTSingleAttributeSplitModel}. This class contains methods for performing basic operations like calculating intersection and union between sets of instances which is required for some of the split criterions. \vitali{TO BE CONTINUED}.
 
@@ -144,24 +169,86 @@ Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and co
     \label{fig:mainstr}
 \end{figure}
 
+\subsubsection{Splitting structure}
+\begin{figure}[!h]
+    \centering
+\includegraphics[width=1\textwidth]{Figures/OCCTSplitModelStructure}
+    \caption{OCCT Splitting criteria structure}
+    \label{fig:splitstr}
+\end{figure}
+\begin{figure}[!h]
+    \centering
+\includegraphics[width=1\textwidth]{Figures/OCCTSplitModelStructure2}
+    \caption{OCCT Splitting criteria structure}
+    \label{fig:splitstr}
+\end{figure}
+\clearpage
+\subsubsection{Prunning structure}
+\begin{figure}[!h]
+    \centering
+\includegraphics[width=1\textwidth]{Figures/OCCTPruneStructure}
+    \caption{OCCT Prunning structure}
+    \label{fig:prunestr}
+\end{figure}
 
 
-
-
-
-
-
+%----------------------------------------------------------------------------------------
+%	SECTION 4 - Future Work
+%----------------------------------------------------------------------------------------
 \section{Future Work and Extensions}
 \begin{comment}
 The major drawback of OCCT which has not been overcame in the implementation is too many possible configurations (four splitting criteria and two pruning methods). Thus, a characterization is required in order to decide which splitting criteria and pruning method should be used in each type of domain.
 \end{comment}
 
-There is still a lot of work that can be done in order to improve and extend the current implementation and allow it to be ran on more datasets. 
+There is still a lot of work that can be done in order to improve and extend the current implementation and allow it to be ran on more datasets.
 
 First, as noted in \cite{dror2011thesis}, the proposed OCCT algorithm is only capable of handling discrete data. Thus, it cannot analyze attributes that consist of continuous values. In case either $T_A$ or $T_B$ has such attributes, some kind of discretization must be applied in order to make them semi-nominal. This discretization must be done during a preprocess step, before running OCCT. In the current version of the implementation, Weka disables the possibility to ran the algorithm on datasets if they have at least one attribute that is not nominal. This is implemented by using the {\em Capabilities} class of Weka, which ensures that features (e.g. handling certain types of attributes) are enabled explicitly. Our suggestion is to implement this missing functionality and allow OCCT to handle both continuous and discrete attributes. For example, handling continuous attributes can be implemented in the same way of C4.5, which creates a threshold and then splits the instances into those whose attribute value is above the threshold and those that are less than or equal to it.
 
 Other problem with the current implementation refers to the input format of the algorithm; currently, OCCT is referred as a classification algorithm, which means that it is located in the Classify tab of Weka and uses the common GUI of a classifier. However, OCCT purpose is solving data linkage problems. The uniqueness of these problems is receiving two datasets as an input and also irrelevant class attribute of the dataset. This type of input does not exist in the Classify tab of the GUI chooser of Weka. Currently, in order to overcome that problem of receiving two datasets as an input, we added an input index, which defines the first column of $T_B$ in the input. Since the input of the algorithm is a training set of only matching instances $T_AB \subseteq T_A \times T_B$, it is sufficient for now. However, Weka has an option of adding extra tabs in the Explorer in order to add new functionality without the hassle of having to dig into the code of the Explorer. We suggest to add a new tab for data linkage algorithms. This tab should be similar to the Classify tab, but it will allow the user to choose two different datasets for $T_A$ and $T_B$.
 
+
+
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 3 - Code usage example
+%----------------------------------------------------------------------------------------
+\clearpage
+\section{Code usage example.}
+\begin{lstlisting}
+	public static void main(String [] argv) throws IOException {
+		// load data from arff file
+		BufferedReader reader = new BufferedReader(
+				new FileReader(new File(argv[0], "database_misuse_example_with_match.arff")));
+		Instances data = new Instances(reader);
+		reader.close();
+        
+        // Train OCCT (don't add any fake class attribute).
+		OCCT occt = new OCCT(true);
+        // Set debugging mode ON.
+		occt.setDebug(true);
+        // Set splitting criteria to MLE.
+        occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
+        // Don't use pruning.
+        occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
+        // Make the attributes of B be: "City", "CustomerTypeDesc" (+1 since indexes are 1-based)
+		occt.setFirstAttributeIndexOfB((data.attribute("City").index() + 1) + "");
+        // Define the linkage threshold
+		occt.setLinkageThreshold(1.0);
+        // Run OCCT and print results
+        try {
+			occt.buildClassifier(data);
+			System.out.println(occt.toString());
+			System.out.println("Classification: " +
+					occt.classifyInstance(data.firstInstance()));
+
+			//System.out.println(occt.graph()); //print tree in dotfile format
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+\end{lstlisting}
 %----------------------------------------------------------------------------------------
 \bibliographystyle{unsrt}
 \bibliography{refFile}
