@@ -116,7 +116,7 @@ public class OCCTProbModelsHandler implements Serializable {
             Classifier currentClassifier = entry.getValue();
             allInstances.setClass(currentAttribute);
             double[] dist = currentClassifier.distributionForInstance(currentInstance);
-            System.out.println("******** dist is " + Arrays.toString(dist) + "******** ");
+            System.out.println("******** dist is " + Arrays.toString(dist) + " ******** ");
             System.out.println(Arrays.toString(dist));
             System.out.println(currentAttribute);
             System.out.println(currentInstance);
