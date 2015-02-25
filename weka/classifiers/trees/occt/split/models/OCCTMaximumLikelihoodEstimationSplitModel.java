@@ -1,7 +1,7 @@
 package weka.classifiers.trees.occt.split.models;
 
-import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
 import weka.classifiers.trees.occt.split.auxiliary.OCCTProbModelsHandler;
+import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
 import weka.classifiers.trees.occt.split.iterators.GeneralInstancesIterator;
 import weka.classifiers.trees.occt.split.iterators.SingleInstancesPairIterator;
 import weka.core.Attribute;

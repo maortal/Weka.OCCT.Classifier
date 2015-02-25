@@ -7,13 +7,13 @@ import java.io.Serializable;
  * 
  * @author Amir Harel
  */
-public class Pair<A, B> implements Serializable {
+public class OCCTPair<A, B> implements Serializable {
 	private static final long serialVersionUID = 4241613232566784963L;
 
 	private A first;
 	private B second;
 
-	public Pair(A first, B second) {
+	public OCCTPair(A first, B second) {
 		this.first = first;
 		this.second = second;
 	}
@@ -36,10 +36,10 @@ public class Pair<A, B> implements Serializable {
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o != null && o instanceof Pair<?,?>) {
-			Pair<A, B> other;
+		if(o != null && o instanceof OCCTPair<?,?>) {
+			OCCTPair<A, B> other;
 			try {
-				other = (Pair<A,B>)o;
+				other = (OCCTPair<A,B>)o;
 			} catch (ClassCastException e) {
 				return false;
 			} 

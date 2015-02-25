@@ -675,9 +675,9 @@ public class OCCT extends Classifier implements OptionHandler, TechnicalInformat
 		// Train OCCT (don't add any fake class attribute)
 		OCCT occt = new OCCT(true);
 		occt.setDebug(true);
-		//occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
+		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_MLE, OCCT.TAGS_SPLIT_CRITERIA));
 		//occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_LPI, OCCT.TAGS_SPLIT_CRITERIA));
-		occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_FGJ, OCCT.TAGS_SPLIT_CRITERIA));
+		//occt.setSplitCriteria(new SelectedTag(OCCT.SPLIT_FGJ, OCCT.TAGS_SPLIT_CRITERIA));
 		occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_NO_PRUNING, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_MLE, OCCT.TAGS_PRUNING_METHOD));
 		//occt.setPruningMethod(new SelectedTag(OCCT.PRUNING_LPI, OCCT.TAGS_PRUNING_METHOD));

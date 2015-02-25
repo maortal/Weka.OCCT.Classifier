@@ -6,6 +6,6 @@ import weka.classifiers.Classifier;
  * Created by sepetnit on 31/01/15.
  *
  */
-public interface ProbModelBasicCreator {
+public interface OCCTProbModelBasicCreator {
     public Classifier getClassifierForProbModel();
 }

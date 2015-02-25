@@ -24,7 +24,7 @@ public class OCCTProbModelsHandler implements Serializable {
     /** for serialization */
     static final long serialVersionUID = -4813820170237218194L;
 
-    ProbModelBasicCreator m_probModelInitializer;
+    OCCTProbModelBasicCreator m_probModelInitializer;
     private List<Attribute> m_attributesToBuildFrom;
     private int[] m_attributesToBuildFromIndexes;
     // Indicated whether the probabilistic models were created
@@ -43,7 +43,7 @@ public class OCCTProbModelsHandler implements Serializable {
     }
 
     public OCCTProbModelsHandler(List<Attribute> attributesToBuildFrom,
-                                 ProbModelBasicCreator probModelInitializer) {
+                                 OCCTProbModelBasicCreator probModelInitializer) {
         this.m_probModelInitializer = probModelInitializer;
         this.m_attributesToBuildFrom = attributesToBuildFrom;
         this.m_probabilisticModels = new HashMap<Attribute,
@@ -146,7 +146,7 @@ public class OCCTProbModelsHandler implements Serializable {
 
 }
 
-class OCCTSerializableBasicModelsCreator implements ProbModelBasicCreator, Serializable {
+class OCCTSerializableBasicModelsCreator implements OCCTProbModelBasicCreator, Serializable {
 
     private static final long serialVersionUID = -4425482033289259153L;
 

@@ -5,11 +5,11 @@ package weka.classifiers.trees.occt.utils;
  *
  * To indicate that the required functionality still was not implemented
  */
-public class NotImplementedException extends Exception{
+public class OCCTNotImplementedException extends Exception {
 
     private static final long serialVersionUID = -8790576835702754651L;
 
-    public NotImplementedException() {
+    public OCCTNotImplementedException() {
         super("Not implemented, yet.");
     }
 }
