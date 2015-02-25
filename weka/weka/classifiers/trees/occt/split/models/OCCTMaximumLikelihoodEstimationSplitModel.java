@@ -1,7 +1,7 @@
 package weka.classifiers.trees.occt.split.models;
 
 import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
-import weka.classifiers.trees.occt.split.auxiliary.ProbModelsHandler;
+import weka.classifiers.trees.occt.split.auxiliary.OCCTProbModelsHandler;
 import weka.classifiers.trees.occt.split.iterators.GeneralInstancesIterator;
 import weka.classifiers.trees.occt.split.iterators.SingleInstancesPairIterator;
 import weka.core.Attribute;
@@ -18,7 +18,7 @@ import java.util.List;
 public class OCCTMaximumLikelihoodEstimationSplitModel extends OCCTSingleAttributeSplitModel  {
     private static final long serialVersionUID = -4241500188359190093L;
 
-    private ProbModelsHandler probModelsBuilder;
+    private OCCTProbModelsHandler probModelsBuilder;
     private boolean useAsPruningMethod;
 
     static {
@@ -30,7 +30,7 @@ public class OCCTMaximumLikelihoodEstimationSplitModel extends OCCTSingleAttribu
                                                      List<Attribute> possibleAttributes,
                                                      List<Attribute> attributesOfB) {
         super(splittingAttribute, possibleAttributes, attributesOfB);
-        this.probModelsBuilder = new ProbModelsHandler(this.m_attributesOfB);
+        this.probModelsBuilder = new OCCTProbModelsHandler(this.m_attributesOfB);
     }
 
     private double calculateLValueForInstances(Instances instances) throws Exception {

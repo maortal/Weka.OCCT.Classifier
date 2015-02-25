@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by sepetnit on 31/01/15.
  *
  */
-public class ProbModelsHandler implements Serializable {
+public class OCCTProbModelsHandler implements Serializable {
 
     /** for serialization */
     static final long serialVersionUID = -4813820170237218194L;
@@ -42,8 +42,8 @@ public class ProbModelsHandler implements Serializable {
         }
     }
 
-    public ProbModelsHandler(List<Attribute> attributesToBuildFrom,
-                             ProbModelBasicCreator probModelInitializer) {
+    public OCCTProbModelsHandler(List<Attribute> attributesToBuildFrom,
+                                 ProbModelBasicCreator probModelInitializer) {
         this.m_probModelInitializer = probModelInitializer;
         this.m_attributesToBuildFrom = attributesToBuildFrom;
         this.m_probabilisticModels = new HashMap<Attribute,
@@ -53,8 +53,8 @@ public class ProbModelsHandler implements Serializable {
     }
 
 
-    public ProbModelsHandler(List<Attribute> attributesToBuildFrom) {
-        this(attributesToBuildFrom, new SerializableBasicModelsCreator());
+    public OCCTProbModelsHandler(List<Attribute> attributesToBuildFrom) {
+        this(attributesToBuildFrom, new OCCTSerializableBasicModelsCreator());
     }
 
     private Remove getRemoveFilter() {
@@ -146,7 +146,7 @@ public class ProbModelsHandler implements Serializable {
 
 }
 
-class SerializableBasicModelsCreator implements ProbModelBasicCreator, Serializable {
+class OCCTSerializableBasicModelsCreator implements ProbModelBasicCreator, Serializable {
 
     private static final long serialVersionUID = -4425482033289259153L;
 

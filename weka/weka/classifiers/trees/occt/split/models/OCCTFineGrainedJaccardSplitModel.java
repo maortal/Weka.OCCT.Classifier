@@ -56,7 +56,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
         for (Attribute currentAttr : this.m_possibleAttributes) {
             if (!currentAttr.equals(this.m_splittingAttribute)) {
                 // It is sufficient to check only if the attribute is missing in the first instance
-                if (!i1.isMissing(currentAttr) &&
+                if (!i1.isMissing(currentAttr) && !i2.isMissing(currentAttr) &&
                         (i1.stringValue(currentAttr).equals(i2.stringValue(currentAttr)))) {
                     intersection.add(currentAttr);
                 }
@@ -103,9 +103,16 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     }
 
     private int calculateUnionSize(Instance i1, Instance i2) {
-        return this.calculateUnion(i1, i2).size();
+        /*
+        If you support missing values, uncomment this and use instead of the current implementation:
+        //return this.calculateUnion(i1, i2).size();
+        */
+        int toReturn = this.m_possibleAttributes.size();
+        if (this.m_possibleAttributes.contains(this.m_splittingAttribute)) {
+            toReturn -= 1;
+        }
+        return toReturn;
     }
-
 
     // TODO: Make this configurable from the GUI
     private static int NUM_OF_CLUSTERS = 100;
@@ -124,7 +131,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     }
 
     /**
-     * This class is used in order to calculate the weka.trees.classifiers.occt.split score between the clusters.
+     * This class is used in order to calculate the split score between the clusters.
      * After the joined instances from T_AB(d1)a and T_AB(d2)a are inserted as an input of the
      * clustering algorithm, we go over them and build an array which contains an instance of this
      * class for each cluster, such that the first element of the pair contains all elements from
@@ -132,6 +139,8 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
      * all elements of T_AB(d2)a that were clustered to this cluster
      */
     private class DataForSingleCluster extends Pair<List<Instance>, List<Instance>> {
+
+        private static final long serialVersionUID = 6703049406745274872L;
 
         private int clusterId;
 
@@ -221,7 +230,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     }
 
     /**
-     * This function calculates the weka.trees.classifiers.occt.split score without clustering given two sets of instances
+     * This function calculates the split score without clustering given two sets of instances
      *
      * @param i1 The first set of instances
      * @param i2 The second set of instances
@@ -275,18 +284,18 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     protected double calculateSplitScoreUsingClustering(Instances i1, Instances i2)
             throws Exception {
         double totalSumOfScores = 0;
-        int totalNumOfComparions = 0;
+        int totalNumOfComparisons = 0;
         // First, perform the clustering
         DataForSingleCluster[] clusteredData = this.clusterInstances(i1, i2);
-        // Aggregate the results of the weka.trees.classifiers.occt.split scores calculation for each of the clusters
+        // Aggregate the results of the split scores calculation for each of the clusters
         for (DataForSingleCluster current : clusteredData) {
             Pair<Double, Integer> internalSplitScoreElements =
                     this.calculateSplitScoreInternal(current.getFirst(), current.getSecond());
             totalSumOfScores += internalSplitScoreElements.getFirst();
-            totalNumOfComparions += internalSplitScoreElements.getSecond();
+            totalNumOfComparisons += internalSplitScoreElements.getSecond();
         }
-        logger.fine("TOTAL " + totalSumOfScores / (double) totalNumOfComparions);
-        return totalSumOfScores / (double)totalNumOfComparions;
+        logger.fine("TOTAL " + totalSumOfScores / (double) totalNumOfComparisons);
+        return totalSumOfScores / (double)totalNumOfComparisons;
     }
 
     protected double calculateSplitScoreWithoutClustering(Instances i1, Instances i2)
@@ -295,7 +304,6 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
                 this.calculateSplitScoreInternal(i1, i2);
         double sumOfScores = internalSplitScoreElements.getFirst();
         int comparisonsCount = internalSplitScoreElements.getSecond();
-        logger.fine("TOTAL " + sumOfScores / (double) comparisonsCount);
         return sumOfScores / (double)comparisonsCount;
     }
 
@@ -303,7 +311,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
     protected double calculateSplitScore(Instances i1, Instances i2) throws Exception {
         // We want to use clustering if the number of instances is too large. Otherwise, if we
         // have less instances than the defined number of clusters, there is no reason to perform
-        // clustering - it will be faster to weka.trees.classifiers.occt.split the instances using the standard equation of
+        // clustering - it will be faster to split the instances using the standard equation of
         // Fine-Grained Jaccard
         if (i1.numInstances() + i2.numInstances() >=
                 OCCTFineGrainedJaccardSplitModel.NUM_OF_CLUSTERS) {

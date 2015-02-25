@@ -5,7 +5,10 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sepetnit on 12/20/2014.
@@ -31,10 +34,12 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
         Enumeration instEnum = instances.enumerateInstances();
         while (instEnum.hasMoreElements()) {
             Instance currentInstance = (Instance) instEnum.nextElement();
+            //System.out.println("is " + instanceAttrsStr);
             if (instanceAttrsStr.equals(this.buildAttrValuesString(currentInstance, true))) {
                 ++toReturn;
             }
         }
+        System.out.println("a");
         return toReturn;
     }
 
@@ -53,7 +58,7 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
 
     /**
      * Calculates single probability of an instance being a part of the intersection of
-     * a random weka.trees.classifiers.occt.split of instances to sets of the same sizes like the given sets of instances
+     * a random split of instances to sets of the same sizes like the given sets of instances
      *
      * @param instance An instance whose probability should be calculated
      * @param allInstancesSets All the sets of instances to calculate according too
@@ -64,16 +69,19 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
                                               Instances[] allInstancesSets) {
         int oi = 0;
         int totalInstancesCount = 0;
-        // The final Pi value
-        double toReturn = 1;
         // First, let's calculate the total number of instances
         for (Instances instances: allInstancesSets) {
+            //System.out.println(instances);
             oi += this.countAppearances(instance, instances);
+            //System.out.println("Current oi is " + oi);
             totalInstancesCount += instances.numInstances();
         }
+        // The final Pi value
+        double toReturn = 1.0;
         // Now, calculate the value of Pi
         for (Instances instances: allInstancesSets) {
-            System.out.println("num: " + instances.numInstances() + " total " + totalInstancesCount + " oi " + oi);
+            System.out.println(allInstancesSets.length);
+            //System.out.println("num: " + instances.numInstances() + " total " + totalInstancesCount + " oi " + oi);
             toReturn -= Math.pow(instances.numInstances() / (double)totalInstancesCount, oi);
         }
         return toReturn;
@@ -82,7 +90,7 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
     /**
      * The function calculates lambda value which is the sum of single probabilities, each one
      * denotes the probability of a record to belong to all the sets of instances in a random
-     * weka.trees.classifiers.occt.split of the unified set to sets of same sizes. For further explanation look at the
+     * split of the unified set to sets of same sizes. For further explanation look at the
      * description of {@see calculateSingleProbability}
      *
      * @param allInstancesSets The sets of instances (divided)
@@ -101,31 +109,38 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
                 //        currentInstance.toString(currentInstance.numAttributes() - 1);
                 // Use all attributes, including the splitting attribute
                 String currentInstanceStr = this.buildAttrValuesString(currentInstance, true);
-                // Calculate if required
                 if (!distinctStringRepresentations.contains(currentInstanceStr)) {
-                    lambdaValue +=
-                            this.calculateSingleProbability(currentInstance, allInstancesSets);
+                    double value = this.calculateSingleProbability(currentInstance, allInstancesSets);
+                    System.out.println(currentInstanceStr + " is " + value);
+                    lambdaValue += value;
                     distinctStringRepresentations.add(currentInstanceStr);
                 }
             }
+            // If you want to run only on instances where vi = di (the first table),
+            // break here.
+            // break;
         }
+        //System.out.println("And total is " + lambdaValue);
         return lambdaValue;
     }
 
     protected double calculateSplitScore(Instances i1, Instances i2) {
-        double STDevToReturn = 0;
+        double stdevToReturn = 0;
         double sumOfPi = this.calculateLambda(new Instances[] {i1, i2});
         System.out.println("lambda is " + sumOfPi);
         if (sumOfPi >= 0) {
             int j = this.calculateIntersectionSize(i1, i2);
             System.out.println("J is " + j);
             if (j > 0) {
-                STDevToReturn = (j - sumOfPi) / Math.sqrt(sumOfPi);
+                stdevToReturn = (j - sumOfPi) / Math.sqrt(sumOfPi);
             } else {
-                STDevToReturn = Math.abs(sumOfPi - j);
+                System.out.println("Negative ...");
+                stdevToReturn = sumOfPi - j;
             }
+
         }
-        return STDevToReturn;
+        System.out.println("Stdev is " + Math.abs(stdevToReturn));
+        return Math.abs(stdevToReturn);
     }
 
 }

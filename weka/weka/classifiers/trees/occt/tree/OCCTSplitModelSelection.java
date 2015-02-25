@@ -96,7 +96,7 @@ public class OCCTSplitModelSelection extends ModelSelection {
      *
      * @param possibleSplitModels An list of models for each possible attribute
      *
-     * @return The chosen weka.trees.classifiers.occt.split model
+     * @return The chosen split model
      */
     private OCCTSplitModel selectBestModel(
             List<OCCTSingleAttributeSplitModel> possibleSplitModels) {

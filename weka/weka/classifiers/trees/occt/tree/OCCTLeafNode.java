@@ -1,6 +1,6 @@
 package weka.classifiers.trees.occt.tree;
 
-import weka.classifiers.trees.occt.split.auxiliary.ProbModelsHandler;
+import weka.classifiers.trees.occt.split.auxiliary.OCCTProbModelsHandler;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -17,7 +17,7 @@ public class OCCTLeafNode implements Serializable {
     private static final long serialVersionUID = 42477850897166532L;
 
 
-    private ProbModelsHandler m_probModels;
+    private OCCTProbModelsHandler m_probModels;
 
     private List<Attribute> m_attributesOfB;
     private List<Attribute> m_selectedAttributesOfB;
@@ -43,7 +43,7 @@ public class OCCTLeafNode implements Serializable {
         if (this.m_selectedAttributesOfB == null) {
             this.m_selectedAttributesOfB = this.m_attributesOfB;
         }
-        this.m_probModels = new ProbModelsHandler(this.m_selectedAttributesOfB);
+        this.m_probModels = new OCCTProbModelsHandler(this.m_selectedAttributesOfB);
         this.m_probModels.buildModels(instances);
     }
 
