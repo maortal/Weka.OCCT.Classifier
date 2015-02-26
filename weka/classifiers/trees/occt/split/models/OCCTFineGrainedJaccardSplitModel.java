@@ -1,7 +1,7 @@
 package weka.classifiers.trees.occt.split.models;
 
 import weka.classifiers.trees.occt.split.auxiliary.OCCTSplitModelComparators;
-import weka.classifiers.trees.occt.utils.Pair;
+import weka.classifiers.trees.occt.utils.OCCTPair;
 import weka.clusterers.Clusterer;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -138,7 +138,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
      * T_AB(d1)a that were clustered to this cluster and the second element of the pair contains
      * all elements of T_AB(d2)a that were clustered to this cluster
      */
-    private class DataForSingleCluster extends Pair<List<Instance>, List<Instance>> {
+    private class DataForSingleCluster extends OCCTPair<List<Instance>, List<Instance>> {
 
         private static final long serialVersionUID = 6703049406745274872L;
 
@@ -240,7 +240,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
      *
      * @throws Exception
      */
-    private Pair<Double, Integer> calculateSplitScoreInternal(Instances i1, Instances i2)
+    private OCCTPair<Double, Integer> calculateSplitScoreInternal(Instances i1, Instances i2)
             throws Exception {
         // Handle empty case
         double sumOfScores = 0;
@@ -259,10 +259,10 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
             }
         }
         // Return the result - don't calculate here the final score
-        return new Pair<Double, Integer>(sumOfScores, comparisonsCount);
+        return new OCCTPair<Double, Integer>(sumOfScores, comparisonsCount);
     }
 
-    private Pair<Double, Integer> calculateSplitScoreInternal(List<Instance> i1, List<Instance> i2)
+    private OCCTPair<Double, Integer> calculateSplitScoreInternal(List<Instance> i1, List<Instance> i2)
             throws Exception {
         // Handle empty case
         double sumOfScores = 0;
@@ -277,7 +277,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
             }
         }
         // Return the result - don't calculate here the final score
-        return new Pair<Double, Integer>(sumOfScores, comparisonsCount);
+        return new OCCTPair<Double, Integer>(sumOfScores, comparisonsCount);
     }
 
 
@@ -289,7 +289,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
         DataForSingleCluster[] clusteredData = this.clusterInstances(i1, i2);
         // Aggregate the results of the split scores calculation for each of the clusters
         for (DataForSingleCluster current : clusteredData) {
-            Pair<Double, Integer> internalSplitScoreElements =
+            OCCTPair<Double, Integer> internalSplitScoreElements =
                     this.calculateSplitScoreInternal(current.getFirst(), current.getSecond());
             totalSumOfScores += internalSplitScoreElements.getFirst();
             totalNumOfComparisons += internalSplitScoreElements.getSecond();
@@ -300,7 +300,7 @@ public class OCCTFineGrainedJaccardSplitModel extends OCCTSingleAttributeSplitMo
 
     protected double calculateSplitScoreWithoutClustering(Instances i1, Instances i2)
             throws Exception {
-        Pair<Double, Integer> internalSplitScoreElements =
+        OCCTPair<Double, Integer> internalSplitScoreElements =
                 this.calculateSplitScoreInternal(i1, i2);
         double sumOfScores = internalSplitScoreElements.getFirst();
         int comparisonsCount = internalSplitScoreElements.getSecond();

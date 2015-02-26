@@ -3,8 +3,8 @@ package weka.classifiers.trees.occt.tree;
 import weka.classifiers.trees.occt.split.auxiliary.OCCTFeatureSelector;
 import weka.classifiers.trees.occt.split.models.OCCTSplitModel;
 import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
-import weka.classifiers.trees.occt.utils.MyStringBuffer;
-import weka.classifiers.trees.occt.utils.Pair;
+import weka.classifiers.trees.occt.utils.OCCTStringBuffer;
+import weka.classifiers.trees.occt.utils.OCCTPair;
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.CapabilitiesHandler;
@@ -169,7 +169,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      */
     public String graph() throws Exception {
         assignIDs(-1);
-        MyStringBuffer text = new MyStringBuffer();
+        OCCTStringBuffer text = new OCCTStringBuffer();
         text.append("digraph OCCTTree {\n");
         graphTree(text);
         return text.toString() + "}\n";
@@ -371,20 +371,20 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
         return nodesCount;
     }
 
-    private List<Pair<String, OCCTInternalClassifierNode>> getSortedSons() {
-        List<Pair<String, OCCTInternalClassifierNode>> toReturn =
-                new ArrayList<Pair<String, OCCTInternalClassifierNode>>(this.m_sons.size());
+    private List<OCCTPair<String, OCCTInternalClassifierNode>> getSortedSons() {
+        List<OCCTPair<String, OCCTInternalClassifierNode>> toReturn =
+                new ArrayList<OCCTPair<String, OCCTInternalClassifierNode>>(this.m_sons.size());
         // Fill the list
         for (Map.Entry<String, OCCTInternalClassifierNode> currentSon : this.m_sons.entrySet()) {
-            toReturn.add(new Pair<String, OCCTInternalClassifierNode>(
+            toReturn.add(new OCCTPair<String, OCCTInternalClassifierNode>(
                     this.m_localModel.rightSide(currentSon.getKey(), this.m_train),
                     currentSon.getValue()));
         }
         // Sort the list
-        toReturn.sort(new Comparator<Pair<String, OCCTInternalClassifierNode>>() {
+        toReturn.sort(new Comparator<OCCTPair<String, OCCTInternalClassifierNode>>() {
             @Override
-            public int compare(Pair<String, OCCTInternalClassifierNode> firstPair,
-                               Pair<String, OCCTInternalClassifierNode> secondPair) {
+            public int compare(OCCTPair<String, OCCTInternalClassifierNode> firstPair,
+                               OCCTPair<String, OCCTInternalClassifierNode> secondPair) {
                 return firstPair.getFirst().compareTo(secondPair.getFirst());
             }
         });
@@ -398,7 +398,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * @param text  for outputting the structure
      * @throws Exception if something goes wrong
      */
-    private void dumpTree(int depth, MyStringBuffer text) throws Exception {
+    private void dumpTree(int depth, OCCTStringBuffer text) throws Exception {
         if (this.m_isLeaf) {
             text.append("\n");
             // Print the relevant number of delimiters (one below the required depth)
@@ -408,8 +408,8 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
             text.append(this.m_leafModel.toString());
         } else {
             // Go over all the sons of the node
-            List<Pair<String, OCCTInternalClassifierNode>> sons = this.getSortedSons();
-            for (Pair<String, OCCTInternalClassifierNode> current : sons) {
+            List<OCCTPair<String, OCCTInternalClassifierNode>> sons = this.getSortedSons();
+            for (OCCTPair<String, OCCTInternalClassifierNode> current : sons) {
                 String rightSide = current.getFirst();
                 OCCTInternalClassifierNode currentSon = current.getSecond();
                 if (!currentSon.m_isEmpty) {
@@ -436,7 +436,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     @Override
     public String toString() {
         try {
-            MyStringBuffer text = new MyStringBuffer();
+            OCCTStringBuffer text = new OCCTStringBuffer();
             this.dumpTree(0, text);
             text.append("\n\nTree size (total number of nodes):\t", this.getNodesCount(), "\n");
             text.append("\nLeaves (number of predictor nodes)\t", this.getLeavesCount(), "\n");
@@ -472,15 +472,15 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * @param text for outputting the tree
      * @throws Exception if something goes wrong
      */
-    private void graphTree(MyStringBuffer text) throws Exception {
+    private void graphTree(OCCTStringBuffer text) throws Exception {
         if (this.m_isLeaf)
             text.append("N" + m_id + " [label=\""
                     + this.m_leafModel.toString() + "\", shape=box]\n");
         else {
             text.append("N" + m_id + " [label=\""
                     + this.m_localModel.leftSide(this.m_train) + "\"]\n");
-            List<Pair<String, OCCTInternalClassifierNode>> sons = this.getSortedSons();
-            for (Pair<String, OCCTInternalClassifierNode> current : sons) {
+            List<OCCTPair<String, OCCTInternalClassifierNode>> sons = this.getSortedSons();
+            for (OCCTPair<String, OCCTInternalClassifierNode> current : sons) {
                 //TODO: remove repeated edges
                 String labelForEdge = current.getFirst();
                 OCCTInternalClassifierNode currentSon = current.getSecond();
