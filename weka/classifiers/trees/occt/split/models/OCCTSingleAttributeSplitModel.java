@@ -2,8 +2,8 @@ package weka.classifiers.trees.occt.split.models;
 
 import weka.classifiers.trees.occt.split.iterators.GeneralInstancesIterator;
 import weka.classifiers.trees.occt.split.iterators.PairedInstancesIterator;
-import weka.classifiers.trees.occt.utils.NotImplementedException;
-import weka.classifiers.trees.occt.utils.Pair;
+import weka.classifiers.trees.occt.utils.OCCTNotImplementedException;
+import weka.classifiers.trees.occt.utils.OCCTPair;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -134,7 +134,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
         return nonEmpty.toArray(new Instances[nonEmpty.size()]);
     }
 
-    protected double calculateSplitScore(Pair<Instances, Instances> instancesSetsPair)
+    protected double calculateSplitScore(OCCTPair<Instances, Instances> instancesSetsPair)
             throws Exception {
         return this.calculateSplitScore(instancesSetsPair.getFirst(),
                 instancesSetsPair.getSecond());
@@ -182,9 +182,9 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
             GeneralInstancesIterator instancesSetsIter =
                     this.getInstancesSetsIterator(trainInstances, splitted);
             while (instancesSetsIter.hasNext()) {
-                Pair<Pair<Instances, Instances>, Double> instancesAndWeights =
+                OCCTPair<OCCTPair<Instances, Instances>, Double> instancesAndWeights =
                         instancesSetsIter.next();
-                Pair<Instances, Instances> instancesSetsToCompare = instancesAndWeights.getFirst();
+                OCCTPair<Instances, Instances> instancesSetsToCompare = instancesAndWeights.getFirst();
                 double weight = instancesAndWeights.getSecond();
                 // Calculate the relative part of this binary weka.trees.classifiers.occt.split
                 toReturn += weight * this.calculateSplitScore(instancesSetsToCompare);
@@ -200,7 +200,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
      * @exception Exception if something goes wrong
      */
     private double handleNumericAttribute(Instances trainInstances) throws Exception {
-        throw new NotImplementedException();
+        throw new OCCTNotImplementedException();
     }
 
 
@@ -301,7 +301,7 @@ public abstract class OCCTSingleAttributeSplitModel extends OCCTSplitModel {
                 return (int) instance.value(this.m_splittingAttribute);
             // Currently, no implementation for numeric attributes
             } else {
-                throw new NotImplementedException();
+                throw new OCCTNotImplementedException();
             }
         }
     }

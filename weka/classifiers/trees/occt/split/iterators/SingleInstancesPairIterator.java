@@ -1,6 +1,6 @@
 package weka.classifiers.trees.occt.split.iterators;
 
-import weka.classifiers.trees.occt.utils.Pair;
+import weka.classifiers.trees.occt.utils.OCCTPair;
 import weka.core.Instances;
 
 public class SingleInstancesPairIterator extends GeneralInstancesIterator {
@@ -20,10 +20,10 @@ public class SingleInstancesPairIterator extends GeneralInstancesIterator {
         return this.currentInstancesIndex < this.splittedInstances.length;
     }
 
-    public Pair<Pair<Instances, Instances>, Double> _next() {
-        Pair<Instances, Instances> instancesPair = new Pair<Instances, Instances>(
+    public OCCTPair<OCCTPair<Instances, Instances>, Double> _next() {
+        OCCTPair<Instances, Instances> instancesPair = new OCCTPair<Instances, Instances>(
                 this.splittedInstances[this.currentInstancesIndex], null);
-        return new Pair<Pair<Instances, Instances>, Double>(instancesPair,
+        return new OCCTPair<OCCTPair<Instances, Instances>, Double>(instancesPair,
                 this.calculateCurrentWeight());
     }
 }

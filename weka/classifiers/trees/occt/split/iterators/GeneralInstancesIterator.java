@@ -1,6 +1,6 @@
 package weka.classifiers.trees.occt.split.iterators;
 
-import weka.classifiers.trees.occt.utils.Pair;
+import weka.classifiers.trees.occt.utils.OCCTPair;
 import weka.core.Instances;
 
 import java.util.NoSuchElementException;
@@ -41,14 +41,14 @@ public abstract class GeneralInstancesIterator {
         return this._hasNext();
     }
 
-    protected abstract Pair<Pair<Instances, Instances>, Double> _next();
+    protected abstract OCCTPair<OCCTPair<Instances, Instances>, Double> _next();
 
-    public Pair<Pair<Instances, Instances>, Double> next() {
+    public OCCTPair<OCCTPair<Instances, Instances>, Double> next() {
         // Assure there is next element
         if (!this.hasNext()) {
             throw new NoSuchElementException();
         }
-        Pair<Pair<Instances, Instances>, Double> toReturn = this._next();
+        OCCTPair<OCCTPair<Instances, Instances>, Double> toReturn = this._next();
         ++this.currentInstancesIndex;
         return toReturn;
     }
