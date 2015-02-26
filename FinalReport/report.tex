@@ -265,7 +265,7 @@ On completion, a new directory named {\em OCCT} and an {\em OCCT.java} file will
 
 \subsubsection{Compiling}
 Now when the OCCT implementation is merged with Weka's source code, it is time to compile the code.
-you need to travel back to '{em Weka-3-6-12/weka}' directory and run {\em ANT}
+you need to travel back to '{\em Weka-3-6-12/weka}' directory and run {\em ANT}
 \begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
   $ cd ../../../
   $ ant exejar
@@ -289,7 +289,7 @@ In the Explorer panel [Fig~\ref{fig:wekaexplorer}] under {\em Preprocess} tab, c
 and select a database file which is a Cartesian product of two tables $T_{A}$ and $T_{B}$.\\
 \clearpage
 Under {\em Classify} tab, click on '{\em Choose}' and select {\em OCCT} which is located under {\em tree} classifiers,
-as shown in Fig~\ref{fig:occtPre}. 
+as shown in Fig~\ref{fig:occtPre}.
 \begin{figure}[!h]
   \centering
   \includegraphics[width=1\textwidth]{Figures/GUI/OCCTPre}\\
@@ -314,8 +314,8 @@ You can now config OCCT's parameters by clicking on the textbox which is located
   score with a given threshold. If score is greater than the given threshold, it is classified as match.
   \item \textbf{{\em pruningMethod}} - In-order to reduce the time complexity of the algorithm, OCCT suggests two prepruning approaches.
   \begin{itemize}
-    \item {\em Least-Probable Intersections} 
-    \item {\em Maximum-Likelihood Estimation} 
+    \item {\em Least-Probable Intersections}
+    \item {\em Maximum-Likelihood Estimation}
   \end{itemize}
   \item \textbf{{\em pruningThreshold}} - In order to determined whether to prune a branch or not we need to compare its pruning method score with
   a given threshold.

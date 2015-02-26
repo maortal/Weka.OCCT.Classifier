@@ -3,8 +3,8 @@ package weka.classifiers.trees.occt.tree;
 import weka.classifiers.trees.occt.split.auxiliary.OCCTFeatureSelector;
 import weka.classifiers.trees.occt.split.models.OCCTSplitModel;
 import weka.classifiers.trees.occt.split.pruning.OCCTGeneralPruningMethod;
-import weka.classifiers.trees.occt.utils.OCCTStringBuffer;
 import weka.classifiers.trees.occt.utils.OCCTPair;
+import weka.classifiers.trees.occt.utils.OCCTStringBuffer;
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.CapabilitiesHandler;
@@ -16,6 +16,7 @@ import weka.core.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -381,13 +382,16 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
                     currentSon.getValue()));
         }
         // Sort the list
-        toReturn.sort(new Comparator<OCCTPair<String, OCCTInternalClassifierNode>>() {
-            @Override
-            public int compare(OCCTPair<String, OCCTInternalClassifierNode> firstPair,
-                               OCCTPair<String, OCCTInternalClassifierNode> secondPair) {
-                return firstPair.getFirst().compareTo(secondPair.getFirst());
-            }
-        });
+        // Use Collections.sort and not sort method of List since it exists only in Java >= 1.8
+        Collections.sort(toReturn,
+                new Comparator<OCCTPair<String, OCCTInternalClassifierNode>>() {
+                    @Override
+                    public int compare(OCCTPair<String, OCCTInternalClassifierNode> firstPair,
+                                       OCCTPair<String, OCCTInternalClassifierNode> secondPair) {
+                        return firstPair.getFirst().compareTo(secondPair.getFirst());
+                    }
+                }
+        );
         return toReturn;
     }
 
