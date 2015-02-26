@@ -15,8 +15,10 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{enumitem}
+\usepackage{dirtree}
 \setlist{nolistsep}
 
+\definecolor{anti-flashwhite}{rgb}{0.95, 0.95, 0.96}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -192,8 +194,95 @@ Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and co
 \end{figure}
 
 
+
+\clearpage
 %----------------------------------------------------------------------------------------
-%	SECTION 4 - Future Work
+%	SECTION 4 - Deployment
+%----------------------------------------------------------------------------------------
+\section{Deployment}
+We will describe how to install and deploy our implementation of OCCT into a working source code of Weka.
+For simplicity we will describe the installation procedure under linux.
+
+\subsection{Dependencies}
+Please make sure you have Ant, GIT, Subversion, installed.
+if that is not the case, please use the following command:
+\begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
+  $ sudo apt-get install ant subversion git
+\end{lstlisting}
+ 
+\subsubsection{Obtain Weka source code}
+The OCCT code was implemented and evaluated on Weka stable version 3.6.12.
+You will now have to checkout that specific branch by using the following svn checkout command:
+ 
+\begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
+  $  svn co https://svn.cms.waikato.ac.nz/svn/weka/tags/stable-3-6-12 Weka-3-6-12
+\end{lstlisting}
+
+\newpar
+A new directory named '{\em Weka-3-6-12}', will be created once the checkout procedure is done.
+The directory structure will be as follows:
+\begin{figure}[!h]
+\dirtree{%
+.1 Weka-3-6-12.
+.2 installer.
+.3 \ldots{}.
+.2 weka.
+.3 build.
+.3 lib.
+.3 resources.
+.3 src.
+.4 main.
+.5 java \begin{minipage}[t]{5cm} \textbf{$\textbf{<}$--- Please go here}\end{minipage}.
+.6 weka.
+.4 test.
+.5 \ldots{}.
+.2 wekadocs.
+.3 \ldots{}.
+.2 wekaexamples.
+.3 \ldots{}.
+}
+    \caption{Weka directory structure}
+    \label{fig:wekadir}
+\end{figure}
+
+\subsection{Installation}
+OCCT code structure was carefully designed for fast deployment into Weka's working source code.
+Before we fetch the latest build you first need get into the right path as shown in Fig.~\ref{fig:wekadir}.
+\begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
+  $ cd Weka-3-6-12/weka/src/main/java
+\end{lstlisting}
+
+\subsubsection{Sync with GIT}
+Once in {\em Weka-3-6-12/weka/src/main/java} directory you will have to init the GIT repository in-order to obtain the latest source files of our implementation.
+Use the following commands to init and sync your local git with our latest build:
+\begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
+  $ git init
+  $ git remote add origin https://github.com/maortal/Weka.OCCT.Classifier.git
+  $ git fetch
+  $ git checkout -t origin/master
+\end{lstlisting}
+\newpar
+On completion, a new directory named {\em OCCT} and an {\em OCCT.java} file will be added to\\
+'{\em Weka-3-6-12/weka/src/main/java/weka/classifiers/trees}' directory.
+
+\subsubsection{Compiling}
+Now when the OCCT implementation is merged with Weka's source code, it is time to compile the code.
+you need to travel back to '{em Weka-3-6-12/weka/}' directory and run {\em ANT}
+\begin{lstlisting}[language=bash,frame=none,backgroundcolor=\color{anti-flashwhite}]
+  $ cd ../../../
+  $ ant exejar
+\end{lstlisting}
+Once compilation is complete an executable jar file {\em weka.jar} was generated in a new folder named '{\em dist}'.
+
+
+
+
+
+
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 5 - Future Work
 %----------------------------------------------------------------------------------------
 \section{Future Work and Extensions}
 \begin{comment}
@@ -211,7 +300,7 @@ Other problem with the current implementation refers to the input format of the 
 
 
 %----------------------------------------------------------------------------------------
-%	SECTION 3 - Code usage example
+%	SECTION 6 - Code usage example
 %----------------------------------------------------------------------------------------
 \clearpage
 \section{Code usage example.}
@@ -222,7 +311,7 @@ Other problem with the current implementation refers to the input format of the 
 				new FileReader(new File(argv[0], "database_misuse_example_with_match.arff")));
 		Instances data = new Instances(reader);
 		reader.close();
-        
+
         // Train OCCT (don't add any fake class attribute).
 		OCCT occt = new OCCT(true);
         // Set debugging mode ON.
