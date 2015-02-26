@@ -475,7 +475,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     private void graphTree(OCCTStringBuffer text) throws Exception {
         if (this.m_isLeaf)
             text.append("N" + m_id + " [label=\""
-                    + this.m_leafModel.toString() + "\", shape=box]\n");
+                    + this.m_leafModel.toString().substring(6) + "\", shape=box]\n");
         else {
             text.append("N" + m_id + " [label=\""
                     + this.m_localModel.leftSide(this.m_train) + "\"]\n");
