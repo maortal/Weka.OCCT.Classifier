@@ -91,7 +91,11 @@ public class OCCTCardinalityHandler implements Serializable {
         while (instancesEnum.hasMoreElements()) {
             Instance currentInstance = (Instance)instancesEnum.nextElement();
             String bRecordAsString = this.getBRecordAsString(currentInstance, firstIndexOfB);
-            double currentCount = this.m_cardinality.getOrDefault(bRecordAsString, 0.0);
+            // We can't use getOrDefault (since it exists only in Java >= 1.8)
+            double currentCount = 0.0;
+            if (this.m_cardinality.containsKey(bRecordAsString)) {
+                currentCount = this.m_cardinality.get(bRecordAsString);
+            }
             this.m_cardinality.put(bRecordAsString, currentCount + 1);
         }
         this.finalizeCardinality();

@@ -67,5 +67,6 @@ $RECYCLE.BIN/
 *.synctex
 *.aux
 *.bbl
-FinalReport/report.pdf
-FinalReport/_temp.pdf
+FinalReport/*.pdf
+FinalReport/*.bak
+
