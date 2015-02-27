@@ -7,6 +7,7 @@
 \usepackage{amsmath} % Required for some math elements
 \usepackage{comment}  % Required for multiline comments
 \usepackage{geometry}
+\usepackage{subcaption}
 \usepackage{graphicx} % Required for the inclusion of images
 \usepackage{natbib} % Required to change bibliography style to ABB
 \usepackage[linesnumbered,ruled,vlined,algo2e]{algorithm2e} % Required for presenting algorithms
@@ -16,8 +17,10 @@
 \usepackage{color}
 \usepackage{enumitem}
 \usepackage{dirtree}
-\setlist{nolistsep}
+\usepackage{caption}
 
+\setlist{nolistsep}
+\captionsetup{justification=centering}
 \definecolor{anti-flashwhite}{rgb}{0.95, 0.95, 0.96}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -273,7 +276,7 @@ you need to travel back to '{em Weka-3-6-12/weka}' directory and run {\em ANT}
 Once compilation is complete an executable jar file {\em weka.jar} was generated in a new folder named '{\em dist}'.
 
 %----------------------------------------------------------------------------------------
-%	SECTION 5 - Deployment
+%	SECTION 5 - GUI Example
 %----------------------------------------------------------------------------------------
 \clearpage
 \section{GUI example}
@@ -289,7 +292,7 @@ In the Explorer panel [Fig~\ref{fig:wekaexplorer}] under {\em Preprocess} tab, c
 and select a database file which is a Cartesian product of two tables $T_{A}$ and $T_{B}$.\\
 \clearpage
 Under {\em Classify} tab, click on '{\em Choose}' and select {\em OCCT} which is located under {\em tree} classifiers,
-as shown in Fig~\ref{fig:occtPre}. 
+as shown in Fig~\ref{fig:occtPre}.
 \begin{figure}[!h]
   \centering
   \includegraphics[width=1\textwidth]{Figures/GUI/OCCTPre}\\
@@ -310,12 +313,12 @@ You can now config OCCT's parameters by clicking on the textbox which is located
   \item \textbf{{\em debug}} - boolean flag, whether to print debugging information or not.
   \item \textbf{{\em firstAttribueIndexOfB}} - since OCCT works on Cartesian product of two table, you will need to provide it the
   index in where $T_{B}$ starts from.
-  \item \textbf{{\em linkageThreshold}} - In order to determined whether the given records are a match or not you need to compare the likelihood
+  \item \textbf{{\em linkageThreshold}} - In order to determined whether the given records are a match or not, you need to compare the likelihood
   score with a given threshold. If score is greater than the given threshold, it is classified as match.
-  \item \textbf{{\em pruningMethod}} - In-order to reduce the time complexity of the algorithm, OCCT suggests two prepruning approaches.
+  \item \textbf{{\em pruningMethod}} - In order to reduce the time complexity of the algorithm, OCCT suggests two prepruning approaches.
   \begin{itemize}
-    \item {\em Least-Probable Intersections} 
-    \item {\em Maximum-Likelihood Estimation} 
+    \item {\em Least-Probable Intersections}
+    \item {\em Maximum-Likelihood Estimation}
   \end{itemize}
   \item \textbf{{\em pruningThreshold}} - In order to determined whether to prune a branch or not we need to compare its pruning method score with
   a given threshold.
@@ -372,7 +375,93 @@ You can now config OCCT's parameters by clicking on the textbox which is located
 \end{lstlisting}
 
 %----------------------------------------------------------------------------------------
-%	SECTION 7 - Future Work
+%	SECTION 7 - Evaluation
+%----------------------------------------------------------------------------------------
+\section{Evaluation}
+We evaluated our implementation of OCCT using the same dataset that was used by the authors of OCCT [Table~\ref{ref:datatable}].
+A side-by-side comparison of snapshots will be presented in-order to show that our implementation of OCCT algorithm is as intended by the authors.
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{|c|c|c|c|c|c|}\hline
+  Request ID & Request Part Of Day & Request Day Of Week & Request Location & Customer City & Customer Type \\\hline
+1          & Afternoon           & Friday              & Berlin           & Berlin        & private       \\\hline
+2          & Afternoon           & Wednesday           & Hamburg          & Hamburg       & private       \\\hline
+3          & Morning             & Wednesday           & Berlin           & Berlin        & business      \\\hline
+4          & Morning             & Wednseday           & Berlin           & Berlin        & private       \\\hline
+5          & Afternoon           & Saturday            & Berlin           & Berlin        & private       \\\hline
+6          & Morning             & Thursday            & Berlin           & Berlin        & private       \\\hline
+7          & Afternoon           & Friday              & Berlin           & Berlin        & private       \\\hline
+8          & Afternoon           & Saturday            & Berlin           & Berlin        & business      \\\hline
+9          & Afternoon           & Saturday            & Berlin           & Berlin        & private       \\\hline
+10         & Afternoon           & Friday              & Hamburg          & Hamburg       & business      \\\hline
+11         & Afternoon           & Monday              & Hamburg          & Hamburg       & business      \\\hline
+12         & Afternoon           & Saturday            & Hamburg          & Hamburg       & private       \\\hline
+13         & Afternoon           & Monday              & Berlin           & Berlin        & private       \\\hline
+14         & Afternoon           & Monday              & Berlin           & Bonn          & private       \\\hline
+15         & Afternoon           & Monday              & Berlin           & Berlin        & private       \\\hline
+16         & Morning             & Saturday            & Bonn             & Bonn          & private       \\\hline
+17         & Morning             & Saturday            & Hamburg          & Hamburg       & private       \\\hline
+18         & Morning             & Saturday            & Hamburg          & Hamburg       & private       \\\hline
+19         & Afternoon           & Friday              & Hamburg          & Hamburg       & private       \\\hline
+20         & Afternoon           & Friday              & Hamburg          & Bonn          & private       \\\hline
+21         & Morning             & Friday              & Hamburg          & Berlin        & private       \\\hline
+22         & Morning             & Friday              & Berlin           & Berlin        & business      \\\hline
+23         & Morning             & Friday              & Berlin           & Berlin        & private       \\\hline
+24         & Afternoon           & Wednseday           & Berlin           & Berlin        & private       \\\hline
+25         & Afternoon           & Thursday            & Berlin           & Berlin        & private       \\\hline
+26         & Afternoon           & Thursday            & Berlin           & Berlin        & business      \\\hline
+27         & Afternoon           & Monday              & Bonn             & Bonn          & business      \\\hline
+28         & Afternoon           & Monday              & Bonn             & Hamburg       & private       \\\hline
+29         & Afternoon           & Monday              & Bonn             & Berlin        & business      \\\hline
+30         & Afternoon           & Wednseday           & Bonn             & Bonn          & business      \\\hline
+31         & Afternoon           & Friday              & Bonn             & Bonn          & private       \\\hline
+
+\end{tabular}
+\caption{Dataset that was used in our evaluation}
+\label{ref:datatable}
+\end{table}
+
+
+
+\clearpage
+\subsection{MLE splitting criteria without pruning}
+Presenting the decision model which was induced from the training set, when used MLE splitting criteria without pruning method.
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}[!h]{1\textwidth}
+  \includegraphics[width=1\textwidth]{Figures/Eval/MaayanMLEnoP}
+  \caption{Dror. M \cite{dror2011thesis}, decision model MLE no pruning.}
+\end{subfigure}
+
+\begin{subfigure}[!h]{1\textwidth}
+  \centering
+  \includegraphics[width=1\textwidth]{Figures/Eval/TreeOut}
+  \caption{Our implementation of OCCT, using MLE splitting criteria without pruning.\\ snapshot taken from Weka tree visualizer}
+\end{subfigure}
+\end{figure}
+
+\subsection{MLE splitting criteria with pruning}
+Presenting the decision model which was induced from the training set, when used MLE splitting criteria and appling MLE pruning.
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}[!h]{1\textwidth}
+  \includegraphics[width=1\textwidth]{Figures/Eval/MaayanMLEwP}
+  \caption{Dror. M \cite{dror2011thesis}, decision model MLE with MLE pruning.}
+\end{subfigure}
+
+\begin{subfigure}[!h]{1\textwidth}
+  \centering
+  \includegraphics[width=1\textwidth]{Figures/Eval/TreeOutwP}
+  \caption{Our implementation of OCCT, using MLE splitting criteria and MLE pruning method.\\ snapshot taken from Weka tree visualizer}
+\end{subfigure}
+\end{figure}
+
+
+%----------------------------------------------------------------------------------------
+%	SECTION 8 - Future Work
 %----------------------------------------------------------------------------------------
 \section{Future Work and Extensions}
 \begin{comment}
