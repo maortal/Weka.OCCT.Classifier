@@ -119,51 +119,50 @@ The code was carefully designed in order to be flexible for future extensions an
 \subsection{How It Works?}
 Like in J48, the main class is called by the name of the algorithm - OCCT. The training is done via the {\em buildClassifier(Instances)} method which creates the root of the tree of the type {\em OCCTInternalClassifierNode} and calls its local {\em buildClassifier(Instances)} method.
 
-\subsubsection{General}
-The algorithm tries to recursively split the dataset contained in each node into subsets. Each internal node, represented by an instance of the {\em OCCTInternalClassifierNode} class, uses an attribute selection method (represented by the {\em OCCTSplitModelSelection} class), which tries to choose the best attribute for split. For this purpose, it evaluates the 'score' for each split (each attribute from $T_{A}$ defines a split) using an instance of {\em OCCTSingleAttributeSplitModel} described in more details in the next Section~(\ref{sec:splitting}).
-
+\subsubsection{General Structure}
+The algorithm tries to recursively split the dataset contained in each node into subsets. Each internal node, represented by an instance of the {\em OCCTInternalClassifierNode} class, uses an attribute selection method (represented by the {\em OCCTSplitModelSelection} class), which tries to choose the best attribute for split. For this purpose, it evaluates the 'score' for each split (each attribute from $T_{A}$ defines a split) using an instance of {\em OCCTSingleAttributeSplitModel} described in more details in the next Section~(\ref{sec:splitting}). A high overview (basic architecture) of the code is shown in the UML Class Diagram presented in Figure~\ref{fig:main}.
+\vspace{0.5cm}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/ClassDiagrams/PDF/MainStructure.pdf}
+    \caption{A UML Class diagram of the OCCT structure}
+    \label{fig:main}
+\end{figure}
 
 \subsubsection{Splitting}\label{sec:splitting}
-The split method can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}. The base class for all the split methods is {\em OCCTSingleAttributeSplitModel}. This class contains methods for performing basic operations like calculating intersection and union between sets of instances which are required for some of the split criteria. All the split methods are instantiated using the Factory design pattern, so their creation logic is not exposed. The class {\em OCCTSplitModelFactory} serves as the Factory for creating all the  split methods. This is done by the {\em getSplitModel} static method. {\em OCCTSplitModelFactory} also serves for deciding about the best attribute to split by comparing the calculated scores for each attribute (e.g. implements the {\em chooseBestSplit} method, presented in~\cite{dror2011thesis,dror2014occt})
+The split method can be of instance of one of the four proposed split criteria, e.g. represented by the {\em OCCTMaximumLikelihoodEstimationSplitModel class}. The base class for all the split methods is {\em OCCTSingleAttributeSplitModel}. This class contains methods for performing basic operations like calculating intersection and union between sets of instances which are required for some of the split criteria. All the split methods are instantiated using the Factory design pattern, so their creation logic is not exposed. The class {\em OCCTSplitModelFactory} serves as the Factory for creating all the  split methods. This is done by the {\em getSplitModel} static method. {\em OCCTSplitModelFactory} also serves for deciding about the best attribute to split by comparing the calculated scores for each attribute (e.g. implements the {\em chooseBestSplit} method, as explained  in~\cite{dror2011thesis,dror2014occt}). The UML Class Diagram which presents the structure of the classes which refer to splitting is presented in Figure~\ref{fig:splitting}.
+\vspace{0.5cm}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figures/ClassDiagrams/PDF/SplitMethods.pdf}
+    \caption{A UML Class diagram of the OCCT Splitting criteria}
+    \label{fig:splitting}
+\end{figure}
 
 \subsubsection{Leafs}
-Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and contains the built probabilistic models (which are represented by the {\em ProbModelsHandler} class). Also, as mentioned in \cite{dror2011thesis} and \cite{dror2014occt}, there is no need to save models for all possible attributes of $T_B$. Thus, a feature selection process is executed on the leaf dataset in order to choose the attributes that will be represented by the leafs. This is done by the {\em OCCTFeatureSelector} class which is instantiated for each internal node and extracts the attributes of leafs in case this node has leafs as children.
-
-
-
-\clearpage
-\subsection{Main structure}
+Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and contains the built probabilistic models (which are represented by the {\em ProbModelsHandler} class). Also, as mentioned in \cite{dror2011thesis} and \cite{dror2014occt}, there is no need to save models for all possible attributes of $T_B$. Thus, a feature selection process is executed on the leaf dataset in order to choose the attributes that will be represented by the leafs. This is done by the {\em OCCTFeatureSelector} class which is instantiated for each internal node and extracts the attributes of leafs in case this node has leafs as children. The relevant UML Class Diagram is presented in Figure~\ref{fig:leafs}.
+\vspace{0.5cm}
 \begin{figure}[!h]
     \centering
-\includegraphics[width=1\textwidth]{Figures/MainStructure}
-    \caption{Main OCCT structure}
-    \label{fig:mainstr}
+    \includegraphics[width=1\textwidth]{Figures/ClassDiagrams/PDF/Leafs.pdf}
+    \caption{A UML Class diagram of the classes which are relevant to leafs of OCCT}
+    \label{fig:leafs}
 \end{figure}
 
-\subsubsection{Splitting structure}
+\subsubsection{Pruning}
+The authors of OCCT chose to follow the prepruning approach and proposed two prepruning methods: based on Maximum-Likelihood Estimation (MLE) or on Least-Probable Intersections (LPI). We support the both methods in our code and allow the user to choose the pruning method to use, along with the option to not apply any pruning. Figure~\ref{fig:pruning} presents a UML Class Diagram which contains the classes relevant for implementation of pruning.
+\vspace{0.5cm}
 \begin{figure}[!h]
     \centering
-\includegraphics[width=1\textwidth]{Figures/OCCTSplitModelStructure}
-    \caption{OCCT Splitting criteria structure}
-    \label{fig:splitstr}
+    \includegraphics[width=1\textwidth]{Figures/ClassDiagrams/PDF/Pruning.pdf}
+    \caption{A UML Class diagram of the classes which are relevant to pruning}
+    \label{fig:pruning}
 \end{figure}
-\begin{figure}[!h]
-    \centering
-\includegraphics[width=1\textwidth]{Figures/OCCTSplitModelStructure2}
-    \caption{OCCT Splitting criteria structure}
-    \label{fig:splitstr}
-\end{figure}
-\clearpage
-\subsubsection{Prunning structure}
-\begin{figure}[!h]
-    \centering
-\includegraphics[width=1\textwidth]{Figures/OCCTPruneStructure}
-    \caption{OCCT Prunning structure}
-    \label{fig:prunestr}
-\end{figure}
+
+\pagebreak
 
 \subsection{Packages}
-The packages structure of the code can be seen in Figure~\ref{fig:packages}. The designed structure allows an easy merge process with the existing Weka source code, as described in Section~\ref{sec:deployment}. The parent packages are {\em src.main.java.weka} which is similar to Weka packages presented in Figure~\ref{fig:wekadir} . Then, inside the {\em weka} package, there is {\em classifiers} package which contains different classifiers. Since our implementation was inspired from J48, only the main class, {\em OCCT.java} is located inside the main package {\em src.main.java.weka.trees.classifiers}, and all other parts of the implementation are located inside the internal {\em weka.classifiers.trees.occt} package.
+The packages structure of the code can be seen in Figure~\ref{fig:packages}. The designed structure allows an easy merge process with the existing Weka source code, as described in Section~\ref{sec:deployment}. The parent packages are {\em src.main.java.weka} which is similar to Weka directory structure presented in Figure~\ref{fig:wekadir}. Then, inside the {\em weka} package, there is {\em classifiers} package which contains different classifiers. Since our implementation was inspired from J48, only the main class, {\em OCCT.java} is located inside the main package {\em src.main.java.weka.trees.classifiers}, and all other parts of the implementation are located inside the internal {\em weka.classifiers.trees.occt} package.
 \begin{figure}[!h]
 \dirtree{%
 .1 weka.
@@ -185,7 +184,7 @@ The packages structure of the code can be seen in Figure~\ref{fig:packages}. The
 \end{figure}
 
 The internal {\em occt} package was divided to three packages: {\em split}, {\em tree} and {\em utils}. The first package, {\em occt.split}, contains all the parts of implementation which refer to the splitting methods, e.g. the {\em split.models} package contains implementation for the four split criteria proposed in~\cite{dror2011thesis,dror2014occt}. The {\em occt.tree} package contains the implementation of the tree structure for representing internal nodes and leafs of the tree, which are built during the training phase and queried during the testing phase. Finally, the {\em occt.utils} package contains some general auxiliary classes which are used in the
-
+\pagebreak
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 %	SECTION 4 - Deployment
 %--------------------------------------------------------------------------------------------------------------------------------------------------
