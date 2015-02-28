@@ -155,14 +155,14 @@ public class OCCTSplitModelSelection extends ModelSelection {
                     (!this.m_attributesOfB.contains(nextAttribute)) &&
                     (nextAttribute.index() != data.classIndex())) {
                 // Get model for current attribute.
-                // TODO: How to decide which type of weka.trees.classifiers.occt.split it will be???
+                // TODO: How to decide which type of split it will be???
                 OCCTSingleAttributeSplitModel currentSplitModel =
                         OCCTSplitModelFactory.getSplitModel(
                                 this.m_splitCriterionType,
                                 nextAttribute, this.m_possibleAttributes, this.m_attributesOfB);
                 currentSplitModel.buildClassifier(data);
 
-                // TODO: Check if useful weka.trees.classifiers.occt.split for current attribute exists and check for
+                // TODO: Check if useful split for current attribute exists and check for
                 // TODO: enumerated attributes with a lot of values.
                 if (currentSplitModel.checkModel()) {
                     possibleSplitModels.add(currentSplitModel);

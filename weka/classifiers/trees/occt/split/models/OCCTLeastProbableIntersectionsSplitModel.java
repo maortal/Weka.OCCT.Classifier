@@ -132,7 +132,7 @@ public class OCCTLeastProbableIntersectionsSplitModel extends OCCTSingleAttribut
             int j = this.calculateIntersectionSize(i1, i2);
             System.out.println("J is " + j);
             if (j > 0) {
-                stdevToReturn = (j - sumOfPi) / Math.sqrt(sumOfPi);
+                stdevToReturn = Math.abs((j - sumOfPi) / Math.sqrt(sumOfPi));
             } else {
                 System.out.println("Negative ...");
                 stdevToReturn = sumOfPi - j;

@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Created by sepetnit on 02/01/15.
  *
- * Responsible of returning an instance of a weka.trees.classifiers.occt.split criterion according to the requirement
+ * Responsible of returning an instance of a split criterion according to the requirement
  *
  */
 public class OCCTSplitModelFactory {

@@ -199,7 +199,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * Method for building a prunable classifier tree.
      *
      * @param instances the data to build the tree from
-     * @throws Exception if weka.trees.classifiers.occt.split.tree can't be built successfully
+     * @throws Exception if tree can't be built successfully
      */
     public void buildClassifier(Instances instances) throws Exception {
         // can the classifier handle the data?
@@ -228,10 +228,7 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
      * @throws Exception if something goes wrong
      */
     public double classifyInstance(Instance instance) throws Exception {
-        /*
-        if (this.m_isEmpty) {
-            return 0.5;
-        }*/
+        // TODO: What should ne done if the son is empty ? (e.g. m_isEmpty == True)
         if (this.m_isLeaf) {
             return this.m_leafModel.classifyInstance(instance);
         }
@@ -241,10 +238,10 @@ public class OCCTInternalClassifierNode implements Drawable, Serializable,
     }
 
     /**
-     * Returns a newly created weka.trees.classifiers.occt.split.tree.
+     * Returns a newly created tree.
      *
      * @param data the training data
-     * @return the generated weka.trees.classifiers.occt.split.tree
+     * @return the generated tree
      * @throws Exception if something goes wrong
      */
     protected OCCTInternalClassifierNode getNewTree(Instances data) throws Exception {
