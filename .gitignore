@@ -70,3 +70,4 @@ $RECYCLE.BIN/
 FinalReport/*.pdf
 FinalReport/*.bak
 
+*.gz

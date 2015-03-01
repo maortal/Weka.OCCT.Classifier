@@ -150,7 +150,7 @@ Each leaf of the tree is represented by the {\em OCCTLeafNodeClass} class and co
 \end{figure}
 
 \subsubsection{Pruning}
-The authors of OCCT chose to follow the prepruning approach and proposed two prepruning methods: based on Maximum-Likelihood Estimation (MLE) or on Least-Probable Intersections (LPI). We support the both methods in our code and allow the user to choose the pruning method to use, along with the option to not apply any pruning. Figure~\ref{fig:pruning} presents a UML Class Diagram which contains the classes relevant for implementation of pruning.
+The authors of OCCT chose to follow the prepruning approach and proposed two prepruning methods: based on Maximum-Likelihood Estimation (MLE) or on Least-Probable Intersections (LPI). We support both methods in our code and allow the user to choose the pruning method to use, along with the option to not apply any pruning. Figure~\ref{fig:pruning} presents a UML Class Diagram which contains the classes relevant for implementation of pruning.
 \vspace{0.5cm}
 \begin{figure}[!h]
     \centering
@@ -183,13 +183,13 @@ The packages structure of the code can be seen in Figure~\ref{fig:packages}. The
     \label{fig:packages}
 \end{figure}
 
-The internal {\em occt} package was divided to three packages: {\em split}, {\em tree} and {\em utils}. The first package, {\em occt.split}, contains all the parts of implementation which refer to the splitting methods, e.g. the {\em split.models} package contains implementation for the four split criteria proposed in~\cite{dror2011thesis,dror2014occt}. The {\em occt.tree} package contains the implementation of the tree structure for representing internal nodes and leafs of the tree, which are built during the training phase and queried during the testing phase. Finally, the {\em occt.utils} package contains some general auxiliary classes which are used in the
+The internal {\em occt} package was divided to three packages: {\em split}, {\em tree} and {\em utils}. The first package, {\em occt.split}, contains all the parts of implementation which refer to the splitting methods, e.g. the {\em split.models} package contains implementation for the four split criteria proposed in~\cite{dror2011thesis,dror2014occt}. The {\em occt.tree} package contains the implementation of the tree structure for representing internal nodes and leafs of the tree, which are built during the training phase and queried during the testing phase. Finally, the {\em occt.utils} package contains some general auxiliary classes.
 \pagebreak
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 %	SECTION 4 - Deployment
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 \section{Deployment}\label{sec:deployment}
-In this Section we describe how to install and deploy our implementation of OCCT into a working source code of Weka. For simplicity we will describe the installation procedure under linux, installation for Windows is similar following the instructions below.
+In this Section we describe how to install and deploy our implementation of OCCT into a working source code of Weka. For simplicity we will describe the installation procedure under Linux, installation for Windows is similar following the instructions below.
 
 \subsection{Dependencies}
 \subsubsection{Prerequisites}
